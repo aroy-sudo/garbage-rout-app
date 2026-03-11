@@ -14,14 +14,28 @@ export default function Home() {
             using AI.
           </p>
         </div>
-        <div className="flex gap-4">
-          <Link href="/login?role=resident">
-            <Button variant="outline">Resident Login</Button>
-          </Link>
+        <div className="mt-8 flex flex-col items-center gap-6">
+          <div className="opacity-50 flex gap-4">
+            <Link href="/login">
+              <Button variant="outline">Resident Login</Button>
+            </Link>
 
-          <Link href="/login?role=collector">
-            <Button>Collector Login</Button>
-          </Link>
+            <Link href="/login">
+              <Button>Collector Login</Button>
+            </Link>
+          </div>
+
+          <div className="my-4 w-full border-t border-zinc-200 dark:border-zinc-800" />
+
+          <div className="flex gap-4">
+            <Link href="/dashboard/resident">
+              <Button variant="destructive">⚡ Dev Bypass: Resident</Button>
+            </Link>
+
+            <Link href="/dashboard/collector">
+              <Button variant="destructive">⚡ Dev Bypass: Collector</Button>
+            </Link>
+          </div>
         </div>
       </main>
     </div>

@@ -6,7 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/src/utils/supabase/client';
 
 function MapClickHandler({ onPositionChange }: { onPositionChange: (latlng: L.LatLng) => void }) {
   useMapEvents({
@@ -69,7 +69,7 @@ export default function ResidentMap() {
       <MapContainer
         center={[21.1938, 81.3509]}
         zoom={13}
-        style={{ height: '400px', width: '100%' }}
+        className="h-[600px] w-full"
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
