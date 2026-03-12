@@ -2,6 +2,13 @@
 
 import { logOut } from "../actions"; 
 import { Button } from "@/components/ui/button";
+import dynamic from "next/dynamic";
+
+// Safely import the map for the client side only
+const CollectorMap = dynamic(() => import("@/src/components/CollectorMap"), {
+  ssr: false,
+  loading: () => <p className="text-zinc-500 flex items-center justify-center h-full">Loading routes...</p>,
+});
 
 export default function CollectorDashboard() {
   return (
@@ -12,19 +19,17 @@ export default function CollectorDashboard() {
             Collector Dashboard
           </h1>
           <p className="text-zinc-600 dark:text-zinc-400">
-            View pending pickups and optimized routes.
+            View pending pickups and optimize your route.
           </p>
         </div>
         
-        {/* The Sign Out Button */}
         <form action={logOut}>
           <Button variant="outline" type="submit">Sign Out</Button>
         </form>
       </div>
       
-      {/* Placeholder for the Collector's Route Map/Table */}
-      <div className="h-[500px] w-full rounded-xl border border-dashed border-zinc-300 bg-zinc-100 flex items-center justify-center dark:border-zinc-800 dark:bg-zinc-900 overflow-hidden relative z-0">
-         <p className="text-zinc-500">Collector Map & Routes Loading...</p>
+      <div className="h-[500px] w-full rounded-xl border border-dashed border-zinc-300 bg-zinc-100 flex items-center justify-center dark:border-zinc-800 dark:bg-zinc-900 overflow-hidden relative z-0 shadow-lg">
+         <CollectorMap />
       </div>
     </div>
   );
