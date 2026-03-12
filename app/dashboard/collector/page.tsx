@@ -3,6 +3,7 @@
 import { logOut } from "../actions"; 
 import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
+import PickupStatusTable from "@/src/components/PickupStatusTable";
 
 // Safely import the map for the client side only
 const CollectorMap = dynamic(() => import("@/src/components/CollectorMap"), {
@@ -31,6 +32,8 @@ export default function CollectorDashboard() {
       <div className="h-[500px] w-full rounded-xl border border-dashed border-zinc-300 bg-zinc-100 flex items-center justify-center dark:border-zinc-800 dark:bg-zinc-900 overflow-hidden relative z-0 shadow-lg">
          <CollectorMap />
       </div>
+
+      <PickupStatusTable />
     </div>
   );
 }

@@ -19,6 +19,16 @@ const DefaultIcon = L.icon({
   iconAnchor: [12, 41],
 });
 
+const bhilaiLocations = [
+  { name: "Kurud Village", lat: 21.2050, lng: 81.3350 },
+  { name: "Kohka Block", lat: 21.2150, lng: 81.3400 },
+  { name: "Supela Market", lat: 21.1980, lng: 81.3500 },
+  { name: "Nehru Nagar Hub", lat: 21.1900, lng: 81.3200 },
+  { name: "Smriti Nagar Camp", lat: 21.2000, lng: 81.3100 },
+  { name: "Sector 6 Depot", lat: 21.1850, lng: 81.3300 },
+  { name: "Junwani Outskirts", lat: 21.2200, lng: 81.3000 },
+];
+
 L.Marker.prototype.options.icon = DefaultIcon;
 
 // Fixed id type to string (uuid) to match Supabase
@@ -57,26 +67,22 @@ const ResidentMap = () => {
   }, []);
 
   const simulateMissedCall = async () => {
-    // Generate a random location near the map center
-    const latOffset = (Math.random() - 0.5) * 0.05;
-    const lngOffset = (Math.random() - 0.5) * 0.05;
-    const newLat = mapCenter[0] + latOffset;
-    const newLng = mapCenter[1] + lngOffset;
+    // Pick a random location from our real Bhilai data
+    const randomLocation = bhilaiLocations[Math.floor(Math.random() * bhilaiLocations.length)];
 
     const { error } = await supabase.from('pickup_requests').insert([
       {
-        latitude: newLat,
-        longitude: newLng,
-        user_id: 'c90a5962-4385-4762-aa15-327e5bb6f1e8', // Requires dummy profile in DB
+        latitude: randomLocation.lat,
+        longitude: randomLocation.lng,
+        user_id: 'c90a5962-4385-4762-aa15-327e5bb6f1e8', // Keep your real Supabase UID here
         status: 'pending'
       },
     ]);
 
     if (error) {
-      console.error('Error simulating missed call:', error);
       toast.error(`Failed to simulate: ${error.message}`);
     } else {
-      toast.success('Missed Call Received: Plastic reported at new location!');
+      toast.success(`Missed Call Received: Plastic reported at ${randomLocation.name}!`);
       fetchPickupRequests(); 
     }
   };
