@@ -5,6 +5,7 @@ import { logOut } from "../actions"; // Import your new server action
 import { Button } from "@/components/ui/button";
 import AnalyticsDashboard from "@/src/components/AnalyticsDashboard";
 import PickupStatusTable from "@/src/components/PickupStatusTable";
+import { WasteChatbot } from "@/src/components/WasteChatbot";
 
 
 // Safely import the Leaflet map for the client side only
@@ -41,6 +42,7 @@ export default function ResidentDashboard() {
         <div className="h-[600px] w-full rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900 overflow-hidden relative z-0">
           <ResidentMap />
         </div>
+        <WasteChatbot />
         <PickupStatusTable />
       </div>
     </div>
