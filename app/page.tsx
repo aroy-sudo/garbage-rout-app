@@ -76,7 +76,7 @@ export default function Home() {
                 Powerful Features for a Cleaner Planet
               </h2>
             </div>
-            
+
             <div className="grid gap-8 md:grid-cols-3">
               <div className="rounded-2xl border border-emerald-100 bg-white p-8 shadow-sm transition-all hover:shadow-md dark:border-emerald-900/30 dark:bg-zinc-900">
                 <div className="mb-4 inline-flex rounded-lg bg-emerald-100 p-3 text-emerald-600 dark:bg-emerald-900/30">
@@ -120,7 +120,7 @@ export default function Home() {
               <h2 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">Our Measurable Impact</h2>
               <p className="text-emerald-100/80 text-xl max-w-2xl mx-auto">Driving sustainability through data-driven operational excellence and route intelligence.</p>
             </div>
-            
+
             <div className="grid gap-12 md:grid-cols-3 text-center">
               <div>
                 <div className="text-6xl lg:text-7xl font-extrabold text-emerald-400 mb-4 tracking-tighter">30%</div>
@@ -163,7 +163,7 @@ export default function Home() {
 
       <footer className="border-t border-zinc-200 bg-white py-8 dark:border-zinc-800 dark:bg-zinc-950">
         <div className="container mx-auto px-4 text-center text-sm text-zinc-500">
-          © 2024 EcoRoute Technologies. All rights reserved.
+          © 2026 EcoRoute Technologies. All rights reserved.
         </div>
       </footer>
     </div>
