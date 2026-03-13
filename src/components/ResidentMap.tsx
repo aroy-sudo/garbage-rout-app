@@ -58,38 +58,10 @@ const ResidentMap = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-<<<<<<< HEAD
   const simulateMissedCall = () => {
     if (!navigator.geolocation) {
       toast.error('Geolocation not supported');
       return;
-=======
-  const simulateMissedCall = async () => {
-    // Pick a random location from our real Bhilai data
-    const randomLocation = bhilaiLocations[Math.floor(Math.random() * bhilaiLocations.length)];
-
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-        toast.error("You must be logged in to simulate a missed call.");
-        return;
-    }
-
-    const { error } = await supabase.from('pickup_requests').insert([
-      {
-        latitude: randomLocation.lat,
-        longitude: randomLocation.lng,
-        user_id: user.id, // Use the dynamic user ID
-        status: 'pending'
-      },
-    ]);
-
-    if (error) {
-      toast.error(`Failed to simulate: ${error.message}`);
-    } else {
-      toast.success(`Missed Call Received: Plastic reported at ${randomLocation.name}!`);
-      fetchPickupRequests(); 
->>>>>>> 89e6fa6 (Add Collector Analytics and Dedicated Invoice flow)
     }
 
     navigator.geolocation.getCurrentPosition(
