@@ -19,15 +19,24 @@ export async function POST(req: Request) {
 
     const supabase = await createClient();
 
-    // 2. Insert the pickup request into Supabase
-    // Using your existing dummy UUID from ResidentMap.tsx to bypass auth restrictions for the bot
-    const dummyUserId = 'c90a5962-4385-4762-aa15-327e5bb6f1e8'; 
-    
+    // 2. Fetch a dynamic user_id as a fallback
+    let userId;
+    const { data: user, error: userError } = await supabase.from('users').select('id').limit(1).single();
+
+    if (userError || !user) {
+        console.error('Error fetching a user:', userError);
+        // Fallback to a default or handle error appropriately
+        return NextResponse.json({ ok: true });
+    }
+    userId = user.id;
+
+
+    // 3. Insert the pickup request into Supabase
     const { error: dbError } = await supabase.from('pickup_requests').insert([
       {
         latitude: 21.2050, // Kurud Village coordinates
         longitude: 81.3350,
-        user_id: dummyUserId,
+        user_id: userId,
         status: 'pending',
       },
     ]);

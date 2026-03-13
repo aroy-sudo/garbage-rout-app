@@ -8,6 +8,7 @@ import PickupStatusTable from "@/src/components/PickupStatusTable";
 import { WasteChatbot } from "@/src/components/WasteChatbot";
 import { Leaf } from "lucide-react";
 import Link from "next/link";
+import PaymentPopup from "@/src/components/PaymentPopup";
 
 // Safely import the Leaflet map for the client side only
 const ResidentMap = dynamic(() => import("@/src/components/ResidentMap"), {
@@ -61,6 +62,7 @@ export default function ResidentDashboard() {
         </div>
 
         <WasteChatbot />
+        <PaymentPopup />
       </main>
     </div>
   );

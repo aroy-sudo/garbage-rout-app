@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import MovingTruck from "./MovingTruck";
 import L from "leaflet";
+import { useRouter } from 'next/navigation';
 
 type PickupRequest = {
   id: string;
@@ -117,28 +118,7 @@ const CollectorMap = () => {
 
   }, []);
 
-  // MARK AS COLLECTED
-  const markAsCollected = async (id: string) => {
-
-    const { error } = await supabase
-      .from("pickup_requests")
-      .update({ status: "collected" })
-      .eq("id", id);
-
-    if (error) {
-
-      console.error(error);
-      toast.error("Failed to update status");
-
-    } else {
-
-      toast.success("Waste marked as collected");
-
-      setPickupRequests((prev) => prev.filter((req) => req.id !== id));
-
-    }
-
-  };
+  const router = useRouter();
 
   // ORS ROUTE LOGIC
   const getOptimizedRoute = useCallback(async () => {
@@ -331,7 +311,6 @@ const CollectorMap = () => {
           />
 
         )}
-
         {/* LOADING MARKER */}
 
         {loadingRoute && !routePath.length && (
@@ -367,7 +346,7 @@ const CollectorMap = () => {
             position={[request.latitude, request.longitude]}
           >
 
-            <Popup>
+            <Popup className="collector-popup">
 
               <div className="text-center p-2 min-w-[150px]">
 
@@ -375,12 +354,12 @@ const CollectorMap = () => {
                   Plastic Reported
                 </p>
 
-                <Button
-                  size="sm"
-                  onClick={() => markAsCollected(request.id)}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                <Button 
+                  size="sm" 
+                  onClick={() => router.push(`/dashboard/collector/pickup/${request.id}`)} 
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
                 >
-                  ✅ Mark Collected
+                  📝 Process Pickup
                 </Button>
 
               </div>

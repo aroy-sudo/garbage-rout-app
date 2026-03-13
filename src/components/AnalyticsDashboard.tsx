@@ -8,24 +8,28 @@ import {
   ChartTooltip, 
   ChartTooltipContent 
 } from "@/components/ui/chart";
-import { Recycle, TrendingUp, Leaf, IndianRupee } from "lucide-react";
+import { Recycle, TrendingUp, Leaf, IndianRupee, Wallet } from "lucide-react";
 
 // Fake data to prove concept to the judges
 const chartData = [
-  { month: "Jan", plastic: 400 },
-  { month: "Feb", plastic: 300 },
-  { month: "Mar", plastic: 550 },
-  { month: "Apr", plastic: 450 },
-  { month: "May", plastic: 700 },
-  { month: "Jun", plastic: 850 },
+  { month: "Jan", plastic: 400, earnings: 4500 },
+  { month: "Feb", plastic: 300, earnings: 3800 },
+  { month: "Mar", plastic: 550, earnings: 6200 },
+  { month: "Apr", plastic: 450, earnings: 5100 },
+  { month: "May", plastic: 700, earnings: 8500 },
+  { month: "Jun", plastic: 850, earnings: 10200 },
 ];
 
 // Shadcn's strict configuration object for chart styling
 const chartConfig = {
   plastic: {
     label: "Plastic Collected (kg)",
-    color: "#059669", // Tailwind Emerald-600 to match your theme
+    color: "#059669", // Emerald-600
   },
+  earnings: {
+    label: "Earnings (Rs)",
+    color: "#d97706", // Amber-600
+  }
 } satisfies ChartConfig;
 
 export default function AnalyticsDashboard() {
@@ -78,33 +82,63 @@ export default function AnalyticsDashboard() {
         </Card>
       </div>
 
-      {/* Bottom Row: The Modern Bar Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Collection Volume (Last 6 Months)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ChartContainer config={chartConfig} className="min-h-[250px] w-full max-h-[300px]">
-            <BarChart accessibilityLayer data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid vertical={false} strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="month" 
-                tickLine={false} 
-                tickMargin={10} 
-                axisLine={false} 
-              />
-              <YAxis 
-                tickLine={false} 
-                axisLine={false} 
-                tickFormatter={(value) => `${value}kg`}
-                fontSize={12}
-              />
-              <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-              <Bar dataKey="plastic" fill="var(--color-plastic)" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ChartContainer>
-        </CardContent>
-      </Card>
+      {/* Bottom Row: The Modern Charts */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Collection Volume (Last 6 Months)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={chartConfig} className="min-h-[250px] w-full max-h-[300px]">
+              <BarChart accessibilityLayer data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="month" 
+                  tickLine={false} 
+                  tickMargin={10} 
+                  axisLine={false} 
+                />
+                <YAxis 
+                  tickLine={false} 
+                  axisLine={false} 
+                  tickFormatter={(value) => `${value}kg`}
+                  fontSize={12}
+                />
+                <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                <Bar dataKey="plastic" fill="var(--color-plastic)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardTitle>Money Earned Through Recycling</CardTitle>
+            <Wallet className="h-4 w-4 text-amber-600" />
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={chartConfig} className="min-h-[250px] w-full max-h-[300px]">
+              <BarChart accessibilityLayer data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="month" 
+                  tickLine={false} 
+                  tickMargin={10} 
+                  axisLine={false} 
+                />
+                <YAxis 
+                  tickLine={false} 
+                  axisLine={false} 
+                  tickFormatter={(value) => `₹${value}`}
+                  fontSize={12}
+                />
+                <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                <Bar dataKey="earnings" fill="var(--color-earnings)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

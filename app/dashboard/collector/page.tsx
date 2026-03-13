@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import PickupStatusTable from "@/src/components/PickupStatusTable";
 import { Leaf } from "lucide-react";
 import Link from "next/link";
+import CollectorAnalytics from "@/src/components/CollectorAnalytics";
 
 // Safely import the map for the client side only
 const CollectorMap = dynamic(() => import("@/src/components/CollectorMap"), {
@@ -37,11 +38,17 @@ export default function CollectorDashboard() {
             Collector Dashboard
           </h1>
           <p className="text-lg text-zinc-600 dark:text-zinc-400">
-            Manage pending pickups and optimize collection routes in real-time.
+            Manage pending pickups, analyze your stats, and optimize collection routes in real-time.
           </p>
         </div>
         
         <div className="grid gap-8">
+          <div className="rounded-2xl bg-white shadow-xl shadow-emerald-900/10 dark:bg-zinc-900 w-full col-span-1 overflow-hidden">
+             <div className="p-6">
+               <CollectorAnalytics />
+             </div>
+          </div>
+          
           <div className="h-[600px] w-full rounded-2xl border border-emerald-100 bg-white shadow-xl shadow-emerald-900/10 overflow-hidden dark:border-emerald-900/30 dark:bg-zinc-900">
              <CollectorMap />
           </div>

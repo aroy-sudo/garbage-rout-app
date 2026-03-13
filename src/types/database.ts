@@ -12,6 +12,12 @@ export interface PickupRequest {
   address: string | null;
   status: 'pending' | 'collected';
   created_at: string;
+  payment_amount: number | null;
+  payment_status: 'pending' | 'accepted' | 'declined' | null;
+  pet_weight: number;
+  hdpe_weight: number;
+  ldpe_weight: number;
+  pp_weight: number;
 }
 
 export interface DriverLocation {
