@@ -13,3 +13,11 @@ export interface PickupRequest {
   status: 'pending' | 'collected';
   created_at: string;
 }
+
+export interface DriverLocation {
+  id: string;
+  driver_id: string;
+  latitude: number;
+  longitude: number;
+  timestamp: string;
+}

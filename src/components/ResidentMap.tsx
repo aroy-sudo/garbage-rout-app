@@ -19,15 +19,7 @@ const DefaultIcon = L.icon({
   iconAnchor: [12, 41],
 });
 
-const bhilaiLocations = [
-  { name: "Kurud Village", lat: 21.2050, lng: 81.3350 },
-  { name: "Kohka Block", lat: 21.2150, lng: 81.3400 },
-  { name: "Supela Market", lat: 21.1980, lng: 81.3500 },
-  { name: "Nehru Nagar Hub", lat: 21.1900, lng: 81.3200 },
-  { name: "Smriti Nagar Camp", lat: 21.2000, lng: 81.3100 },
-  { name: "Sector 6 Depot", lat: 21.1850, lng: 81.3300 },
-  { name: "Junwani Outskirts", lat: 21.2200, lng: 81.3000 },
-];
+
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
@@ -66,25 +58,47 @@ const ResidentMap = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const simulateMissedCall = async () => {
-    // Pick a random location from our real Bhilai data
-    const randomLocation = bhilaiLocations[Math.floor(Math.random() * bhilaiLocations.length)];
-
-    const { error } = await supabase.from('pickup_requests').insert([
-      {
-        latitude: randomLocation.lat,
-        longitude: randomLocation.lng,
-        user_id: 'c90a5962-4385-4762-aa15-327e5bb6f1e8', // Keep your real Supabase UID here
-        status: 'pending'
-      },
-    ]);
-
-    if (error) {
-      toast.error(`Failed to simulate: ${error.message}`);
-    } else {
-      toast.success(`Missed Call Received: Plastic reported at ${randomLocation.name}!`);
-      fetchPickupRequests(); 
+  const simulateMissedCall = () => {
+    if (!navigator.geolocation) {
+      toast.error('Geolocation not supported');
+      return;
     }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        const { error } = await supabase.from('pickup_requests').insert([
+          {
+            latitude: lat,
+            longitude: lng,
+            address: `GPS Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`,
+            user_id: 'c90a5962-4385-4762-aa15-327e5bb6f1e8',
+            status: 'pending'
+          },
+        ]);
+
+        if (error) {
+          toast.error(`Failed: ${error.message}`);
+        } else {
+          toast.success(`✅ Missed Call Logged: Plastic at your GPS [${lat.toFixed(4)}, ${lng.toFixed(4)}]!`);
+          fetchPickupRequests(); 
+        }
+      },
+      (error) => {
+        toast.error('GPS access denied - using fallback');
+        const fallbackLat = 21.1938;
+        const fallbackLng = 81.3509;
+        supabase.from('pickup_requests').insert([{
+          latitude: fallbackLat,
+          longitude: fallbackLng,
+          user_id: 'c90a5962-4385-4762-aa15-327e5bb6f1e8',
+          status: 'pending'
+        }]).then(() => fetchPickupRequests());
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
   };
 
   return (
@@ -104,7 +118,7 @@ const ResidentMap = () => {
         {pickupRequests.map((request) => (
           <Marker key={request.id} position={[request.latitude, request.longitude]} />
         ))}
-        <MovingTruck />
+        <MovingTruck position={mapCenter} />
       </MapContainer>
     </div>
   );
