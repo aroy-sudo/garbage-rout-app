@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/src/utils/supabase/client";
 import { PickupRequest } from "@/src/types/database";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Users, Truck, Banknote, PackageOpen } from "lucide-react";
+import { Users, Truck, Banknote, PackageOpen, Map as MapIcon } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const WasteRecyclerMap = dynamic(() => import("@/src/components/WasteRecyclerMap"), {
+  ssr: false,
+  loading: () => <div className="h-full w-full flex items-center justify-center bg-zinc-100 dark:bg-zinc-900 text-zinc-500 animate-pulse">Initializing District Heatmap...</div>,
+});
 
 type CollectorStat = {
   collector_id: string;
@@ -135,6 +141,11 @@ export default function RecyclerDashboard() {
                 </div>
               </CardContent>
             </Card>
+          </div>
+
+          {/* District Heatmap Visualization */}
+          <div className="h-[500px] w-full rounded-2xl border border-blue-100 bg-white shadow-xl shadow-blue-900/10 overflow-hidden dark:border-blue-900/30 dark:bg-zinc-900 mb-10 relative z-0">
+             <WasteRecyclerMap />
           </div>
 
           {/* Collectors Table */}
