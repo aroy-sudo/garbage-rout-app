@@ -1,6 +1,6 @@
 export interface Profile {
   id: string;
-  role: 'resident' | 'collector';
+  role: 'resident' | 'collector' | 'wasterecycler' | 'admin';
   created_at: string;
 }
 
@@ -18,6 +18,7 @@ export interface PickupRequest {
   hdpe_weight: number;
   ldpe_weight: number;
   pp_weight: number;
+  collector_id: string | null;
 }
 
 export interface DriverLocation {

@@ -71,6 +71,8 @@ export default function CollectorPickupInvoice() {
       return;
     }
 
+    const { data: { user } } = await supabase.auth.getUser();
+
     const { error } = await supabase
       .from('pickup_requests')
       .update({ 
@@ -81,6 +83,7 @@ export default function CollectorPickupInvoice() {
         hdpe_weight: parseFloat(hdpe) || 0,
         ldpe_weight: parseFloat(ldpe) || 0,
         pp_weight: parseFloat(pp) || 0,
+        collector_id: user?.id || null,
       })
       .eq('id', id);
 
