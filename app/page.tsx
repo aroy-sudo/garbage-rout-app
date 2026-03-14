@@ -53,15 +53,25 @@ export default function Home() {
             <p className="mx-auto mt-6 max-w-3xl text-xl sm:text-2xl leading-relaxed text-zinc-600 dark:text-zinc-400 font-medium">
               EcoRoute optimizes collection paths, reduces carbon footprint, and empowers communities to build a cleaner future.
             </p>
-            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row flex-wrap">
               <Link href="/login">
                 <Button size="lg" className="h-12 px-8 bg-emerald-700 hover:bg-emerald-800 text-white rounded-full shadow-lg shadow-emerald-900/20">
                   Collector Login
                 </Button>
               </Link>
               <Link href="/login">
-                <Button size="lg" variant="outline" className="h-12 px-8 border-emerald-200 text-emerald-900 hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-400 rounded-full shadow-sm">
+                <Button size="lg" variant="outline" className="h-12 px-8 border-emerald-200 text-emerald-900 hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-400 rounded-full shadow-sm bg-white dark:bg-zinc-950">
                   Resident Login
+                </Button>
+              </Link>
+              <Link href="/login">
+                <Button size="lg" variant="outline" className="h-12 px-8 border-blue-200 text-blue-900 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400 rounded-full shadow-sm bg-white dark:bg-zinc-950">
+                  Recycler Login
+                </Button>
+              </Link>
+              <Link href="/login">
+                <Button size="lg" variant="outline" className="h-12 px-8 border-purple-200 text-purple-900 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-400 rounded-full shadow-sm bg-white dark:bg-zinc-950">
+                  Admin Login
                 </Button>
               </Link>
             </div>
@@ -145,15 +155,25 @@ export default function Home() {
         <section className="bg-zinc-100 py-12 dark:bg-zinc-900/50">
           <div className="container mx-auto px-4 text-center">
             <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Development Tools</span>
-            <div className="mt-4 flex justify-center gap-4">
+            <div className="mt-4 flex flex-wrap justify-center gap-4">
               <Link href="/dashboard/resident">
-                <Button variant="secondary" size="sm" className="bg-white dark:bg-zinc-800 rounded-full shadow-sm">
+                <Button variant="secondary" size="sm" className="bg-white dark:bg-zinc-800 rounded-full shadow-sm hover:bg-emerald-50 dark:hover:bg-emerald-900/40">
                   ⚡ Dev Bypass: Resident
                 </Button>
               </Link>
               <Link href="/dashboard/collector">
-                <Button variant="secondary" size="sm" className="bg-white dark:bg-zinc-800 rounded-full shadow-sm">
+                <Button variant="secondary" size="sm" className="bg-white dark:bg-zinc-800 rounded-full shadow-sm hover:bg-emerald-50 dark:hover:bg-emerald-900/40">
                   ⚡ Dev Bypass: Collector
+                </Button>
+              </Link>
+              <Link href="/dashboard/wasterecycler">
+                <Button variant="secondary" size="sm" className="bg-white dark:bg-zinc-800 rounded-full shadow-sm hover:bg-blue-50 dark:hover:bg-blue-900/40">
+                  ⚡ Dev Bypass: Recycler
+                </Button>
+              </Link>
+              <Link href="/dashboard/admin">
+                <Button variant="secondary" size="sm" className="bg-white dark:bg-zinc-800 rounded-full shadow-sm hover:bg-purple-50 dark:hover:bg-purple-900/40">
+                  ⚡ Dev Bypass: Admin
                 </Button>
               </Link>
             </div>
