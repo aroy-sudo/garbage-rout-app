@@ -7,7 +7,7 @@ import { createClient } from '@/src/utils/supabase/client';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import MovingTruck from './MovingTruck';
-import { GeoPoint, RESIDENTS, RECYCLERS } from '@/src/lib/demoData';
+import { GeoPoint, SHGS, RECYCLERS } from '@/src/lib/demoData';
 
 // Custom Leaflet Recycler Icon using an inline SVG
 const recyclerSvg = encodeURIComponent(`
@@ -31,8 +31,8 @@ const DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-// Custom resident icon (red dot)
-const ResidentIcon = L.divIcon({
+// Custom SHG icon (red dot)
+const SHGIcon = L.divIcon({
   html: `<div style="background-color: #f43f5e; width: 14px; height: 14px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 4px rgba(0,0,0,0.4);"></div>`,
   className: 'bg-transparent border-0',
   iconSize: [18, 18],
@@ -73,7 +73,7 @@ const ResidentMap = () => {
   const [dummyTrucks, setDummyTrucks] = useState<DummyTruck[]>([]);
   
   // Track all IDs ever spawned to strictly prevent duplicates
-  const usedResidentIds = useRef<Set<string>>(new Set());
+  const usedSHGIds = useRef<Set<string>>(new Set());
 
   // Center exactly on Raipur based on the new user provided data
   const mapCenter: [number, number] = [21.2510, 81.6350];
@@ -99,7 +99,7 @@ const ResidentMap = () => {
          })).filter((req: GeoPoint) => req.lat !== 0 && req.lng !== 0);
          
          // Mark all IDs from the server as used so they aren't randomly picked again
-         serverPickups.forEach(p => usedResidentIds.current.add(p.id));
+         serverPickups.forEach(p => usedSHGIds.current.add(p.id));
          setActivePickups(serverPickups);
       }
     };
@@ -120,7 +120,7 @@ const ResidentMap = () => {
                 ...prev, 
                 { id: safeId, lat: newRequest.latitude || 0, lng: newRequest.longitude || 0 }
             ]);
-            usedResidentIds.current.add(safeId);
+            usedSHGIds.current.add(safeId);
           }
         }
       )
@@ -187,25 +187,25 @@ const ResidentMap = () => {
   }, []);
 
   const simulateMissedCall = async () => {
-    // Strict filtering using the Set to guarantee locations are never reused
-    const availableResidents = RESIDENTS.filter(
-        r => !usedResidentIds.current.has(r.id)
+    // Pick a random untouched SHG from the Raipur Dataset!
+    const availableSHGs = SHGS.filter(
+        r => !usedSHGIds.current.has(r.id)
     );
 
-    if (availableResidents.length === 0) {
-        toast.error("All residents in the dataset have already requested a pickup!");
+    if (availableSHGs.length === 0) {
+        toast.error("All SHGs in the dataset have already requested a pickup!");
         return;
     }
 
-    // Pick a random untouched resident from the Raipur Dataset!
-    const randomResident = availableResidents[Math.floor(Math.random() * availableResidents.length)];
+    // Pick a random untouched SHG
+    const randomSHG = availableSHGs[Math.floor(Math.random() * availableSHGs.length)];
     
-    // Execute the INSERT command deep into the Supabase database
+    // Execute the INSERT command into Supabase
     const { error } = await supabase.from('pickup_requests').insert([
         {
-          user_id: randomResident.id, // Ensure we definitively log the user ID!
-          latitude: randomResident.lat,
-          longitude: randomResident.lng,
+          user_id: randomSHG.id,
+          latitude: randomSHG.lat,
+          longitude: randomSHG.lng,
           status: 'pending',
           pet_weight: parseFloat((Math.random() * 8 + 1).toFixed(1)),
           hdpe_weight: parseFloat((Math.random() * 2 + 1).toFixed(1)),
@@ -217,7 +217,7 @@ const ResidentMap = () => {
     if (error) {
         toast.error(`Database Error: ${error.message}`);
     } else {
-        toast.success(`✅ Missed Call Logged: Request from ${randomResident.id} successfully broadcasted to platform!`);
+        toast.success(`✅ Missed Call Logged: Request from ${randomSHG.id} successfully broadcasted to platform!`);
         // We do not run setActivePickups here! It will automatically map via the Supabase Live Subscription!
     }
   };
@@ -252,15 +252,15 @@ const ResidentMap = () => {
         ))}
 
         {/* Render Pending Pickups from Supabase */}
-        {activePickups.map((resident) => (
+        {activePickups.map((shg) => (
             <Marker
-                key={resident.id}
-                position={[resident.lat, resident.lng]}
-                icon={ResidentIcon}
+                key={shg.id}
+                position={[shg.lat, shg.lng]}
+                icon={SHGIcon}
             >
                <Popup>
                   <strong>📍 Pending Pickup</strong><br/>
-                  Resident: <span className="font-mono text-xs">{resident.id}</span>
+                  SHG: <span className="font-mono text-xs">{shg.id}</span>
                </Popup>
             </Marker>
         ))}

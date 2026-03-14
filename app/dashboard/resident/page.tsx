@@ -37,10 +37,10 @@ export default function ResidentDashboard() {
       <main className="flex-1 relative z-10 container mx-auto px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-10">
           <h1 className="text-4xl font-extrabold tracking-tight text-emerald-900 dark:text-emerald-400 mb-2">
-            Gram Panchayat Admin Dashboard
+            SHG Dashboard
           </h1>
           <p className="text-lg text-zinc-600 dark:text-zinc-400">
-            Monitor village plastic availability and route analytics in real-time.
+            Monitor SHG plastic collection requests and real-time routing analytics.
           </p>
         </div>
 

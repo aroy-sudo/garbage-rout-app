@@ -34,8 +34,8 @@ export const RECYCLERS: GeoPoint[] = [
     { id: "WR-Tikrapara-1", lat: 21.2300, lng: 81.6370 }
 ];
 
-// 3. Residents Clustered Around Hexagons (Spaced wider to allow routing)
-export const RESIDENTS: GeoPoint[] = [
+// 3. SHGs Clustered Around Hexagons (Spaced wider to allow routing)
+export const SHGS: GeoPoint[] = [
     // Hexagon 1 (Tatibandh)
     { id: "Res-Tatibandh-A", lat: 21.2610, lng: 81.5880 },
     { id: "Res-Tatibandh-B", lat: 21.2550, lng: 81.5820 },
