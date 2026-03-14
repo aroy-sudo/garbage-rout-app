@@ -9,7 +9,7 @@ export interface PickupRequest {
   user_id: string;
   latitude: number;
   longitude: number;
-  address: string | null;
+
   status: 'pending' | 'collected';
   created_at: string;
   payment_amount: number | null;

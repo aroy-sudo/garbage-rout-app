@@ -73,7 +73,6 @@ const ResidentMap = () => {
           {
             latitude: lat,
             longitude: lng,
-            address: `GPS Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`,
             user_id: 'c90a5962-4385-4762-aa15-327e5bb6f1e8',
             status: 'pending'
           },
