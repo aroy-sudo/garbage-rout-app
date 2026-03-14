@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import MovingTruck from "./MovingTruck";
 import L from "leaflet";
 import { useRouter } from 'next/navigation';
+import { RECYCLERS } from "@/src/lib/demoData";
 
 type PickupRequest = {
   id: string;
@@ -26,6 +27,21 @@ const DefaultIcon = L.icon({
 });
 
 L.Marker.prototype.options.icon = DefaultIcon;
+
+// Waste Recycler SVG icon (green recycling symbol)
+const recyclerSvg = encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="40" height="40">
+  <circle cx="24" cy="24" r="22" fill="#16a34a" stroke="white" stroke-width="2"/>
+  <text x="24" y="30" font-size="22" text-anchor="middle" fill="white">♻</text>
+</svg>
+`);
+
+const RecyclerIcon = L.icon({
+  iconUrl: `data:image/svg+xml,${recyclerSvg}`,
+  iconSize: [40, 40],
+  iconAnchor: [20, 20],
+  popupAnchor: [0, -22],
+});
 
 const FALLBACK_LOCATION: [number, number] = [21.1938, 81.3509];
 const MAP_CENTER: [number, number] = [21.1938, 81.3509];
@@ -336,6 +352,20 @@ const CollectorMap = () => {
         )}
 
         <MovingTruck position={driverPosition || FALLBACK_LOCATION} />
+
+        {/* RECYCLER STATION MARKERS */}
+        {RECYCLERS.map((recycler) => (
+          <Marker
+            key={recycler.id}
+            position={[recycler.lat, recycler.lng]}
+            icon={RecyclerIcon}
+          >
+            <Popup>
+              <strong>♻️ Waste Recycler Station</strong><br/>
+              <span className="font-mono text-xs text-green-700">{recycler.id}</span>
+            </Popup>
+          </Marker>
+        ))}
 
         {/* PICKUP MARKERS */}
 

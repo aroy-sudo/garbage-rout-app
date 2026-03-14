@@ -9,6 +9,15 @@ import { toast } from 'sonner';
 import MovingTruck from './MovingTruck';
 import { GeoPoint, RESIDENTS, RECYCLERS } from '@/src/lib/demoData';
 
+// Custom Leaflet Recycler Icon using an inline SVG
+const recyclerSvg = encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="40" height="40">
+  <circle cx="24" cy="24" r="22" fill="#16a34a" stroke="white" stroke-width="2"/>
+  <text x="24" y="30" font-size="22" text-anchor="middle" fill="white">♻</text>
+</svg>
+`);
+
+
 // Leaflet's default icon doesn't work well with React, so we need to fix it.
 import L from 'leaflet';
 
@@ -28,6 +37,14 @@ const ResidentIcon = L.divIcon({
   className: 'bg-transparent border-0',
   iconSize: [18, 18],
   iconAnchor: [9, 9]
+});
+
+// Waste Recycler icon - green recycling symbol
+const RecyclerIcon = L.icon({
+  iconUrl: `data:image/svg+xml,${recyclerSvg}`,
+  iconSize: [40, 40],
+  iconAnchor: [20, 20],
+  popupAnchor: [0, -22],
 });
 
 // Dummy truck type for animated collectors
@@ -219,6 +236,20 @@ const ResidentMap = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
+
+        {/* Render Waste Recycler Station Markers */}
+        {RECYCLERS.map((recycler) => (
+            <Marker
+                key={recycler.id}
+                position={[recycler.lat, recycler.lng]}
+                icon={RecyclerIcon}
+            >
+               <Popup>
+                  <strong>♻️ Waste Recycler</strong><br/>
+                  <span className="font-mono text-xs text-green-700">{recycler.id}</span>
+               </Popup>
+            </Marker>
+        ))}
 
         {/* Render Pending Pickups from Supabase */}
         {activePickups.map((resident) => (
