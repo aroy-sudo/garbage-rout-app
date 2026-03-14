@@ -34,82 +34,82 @@ export const RECYCLERS: GeoPoint[] = [
     { id: "WR-Tikrapara-1", lat: 21.2300, lng: 81.6370 }
 ];
 
-// 3. Residents Clustered Around Hexagons
+// 3. Residents Clustered Around Hexagons (Spaced wider to allow routing)
 export const RESIDENTS: GeoPoint[] = [
     // Hexagon 1 (Tatibandh)
-    { id: "Res-Tatibandh-A", lat: 21.2585, lng: 81.5855 },
-    { id: "Res-Tatibandh-B", lat: 21.2575, lng: 81.5845 },
-    { id: "Res-Tatibandh-C", lat: 21.2582, lng: 81.5860 },
-    { id: "Res-Tatibandh-D", lat: 21.2590, lng: 81.5848 },
-    
+    { id: "Res-Tatibandh-A", lat: 21.2610, lng: 81.5880 },
+    { id: "Res-Tatibandh-B", lat: 21.2550, lng: 81.5820 },
+    { id: "Res-Tatibandh-C", lat: 21.2592, lng: 81.5910 },
+    { id: "Res-Tatibandh-D", lat: 21.2640, lng: 81.5838 },
+
     // Hexagon 2 (Shankar Nagar)
-    { id: "Res-ShankarNagar-A", lat: 21.2535, lng: 81.6545 },
-    { id: "Res-ShankarNagar-B", lat: 21.2525, lng: 81.6535 },
-    { id: "Res-ShankarNagar-C", lat: 21.2532, lng: 81.6550 },
-    { id: "Res-ShankarNagar-D", lat: 21.2540, lng: 81.6538 },
-    { id: "Res-ShankarNagar-E", lat: 21.2528, lng: 81.6542 },
-    
+    { id: "Res-ShankarNagar-A", lat: 21.2560, lng: 81.6570 },
+    { id: "Res-ShankarNagar-B", lat: 21.2500, lng: 81.6510 },
+    { id: "Res-ShankarNagar-C", lat: 21.2542, lng: 81.6600 },
+    { id: "Res-ShankarNagar-D", lat: 21.2590, lng: 81.6528 },
+    { id: "Res-ShankarNagar-E", lat: 21.2518, lng: 81.6552 },
+
     // Hexagon 3 (Pandri)
-    { id: "Res-Pandri-A", lat: 21.2675, lng: 81.6475 },
-    { id: "Res-Pandri-B", lat: 21.2665, lng: 81.6465 },
-    { id: "Res-Pandri-C", lat: 21.2672, lng: 81.6480 },
-    { id: "Res-Pandri-D", lat: 21.2680, lng: 81.6468 },
-    
+    { id: "Res-Pandri-A", lat: 21.2700, lng: 81.6500 },
+    { id: "Res-Pandri-B", lat: 21.2640, lng: 81.6440 },
+    { id: "Res-Pandri-C", lat: 21.2682, lng: 81.6530 },
+    { id: "Res-Pandri-D", lat: 21.2730, lng: 81.6458 },
+
     // Hexagon 4 (Telibandha - Zone 1)
-    { id: "Res-Telibandha1-A", lat: 21.2445, lng: 81.6645 },
-    { id: "Res-Telibandha1-B", lat: 21.2435, lng: 81.6635 },
-    { id: "Res-Telibandha1-C", lat: 21.2442, lng: 81.6650 },
-    { id: "Res-Telibandha1-D", lat: 21.2450, lng: 81.6638 },
-    { id: "Res-Telibandha1-E", lat: 21.2438, lng: 81.6642 },
-    
+    { id: "Res-Telibandha1-A", lat: 21.2470, lng: 81.6670 },
+    { id: "Res-Telibandha1-B", lat: 21.2410, lng: 81.6610 },
+    { id: "Res-Telibandha1-C", lat: 21.2452, lng: 81.6700 },
+    { id: "Res-Telibandha1-D", lat: 21.2500, lng: 81.6628 },
+    { id: "Res-Telibandha1-E", lat: 21.2428, lng: 81.6652 },
+
     // Hexagon 5 (Telibandha - Zone 2)
-    { id: "Res-Telibandha2-A", lat: 21.2405, lng: 81.6605 },
-    { id: "Res-Telibandha2-B", lat: 21.2395, lng: 81.6595 },
-    { id: "Res-Telibandha2-C", lat: 21.2402, lng: 81.6610 },
-    { id: "Res-Telibandha2-D", lat: 21.2410, lng: 81.6598 },
-    
+    { id: "Res-Telibandha2-A", lat: 21.2430, lng: 81.6630 },
+    { id: "Res-Telibandha2-B", lat: 21.2370, lng: 81.6570 },
+    { id: "Res-Telibandha2-C", lat: 21.2412, lng: 81.6660 },
+    { id: "Res-Telibandha2-D", lat: 21.2460, lng: 81.6588 },
+
     // Hexagon 6 (Bhatagaon)
-    { id: "Res-Bhatagaon-A", lat: 21.2175, lng: 81.6275 },
-    { id: "Res-Bhatagaon-B", lat: 21.2165, lng: 81.6265 },
-    { id: "Res-Bhatagaon-C", lat: 21.2172, lng: 81.6280 },
-    { id: "Res-Bhatagaon-D", lat: 21.2180, lng: 81.6268 },
-    
+    { id: "Res-Bhatagaon-A", lat: 21.2200, lng: 81.6300 },
+    { id: "Res-Bhatagaon-B", lat: 21.2140, lng: 81.6240 },
+    { id: "Res-Bhatagaon-C", lat: 21.2182, lng: 81.6330 },
+    { id: "Res-Bhatagaon-D", lat: 21.2230, lng: 81.6258 },
+
     // Hexagon 7 (Gudhiyari)
-    { id: "Res-Gudhiyari-A", lat: 21.2645, lng: 81.6175 },
-    { id: "Res-Gudhiyari-B", lat: 21.2635, lng: 81.6165 },
-    { id: "Res-Gudhiyari-C", lat: 21.2642, lng: 81.6180 },
-    { id: "Res-Gudhiyari-D", lat: 21.2650, lng: 81.6168 },
-    { id: "Res-Gudhiyari-E", lat: 21.2638, lng: 81.6172 },
-    
+    { id: "Res-Gudhiyari-A", lat: 21.2670, lng: 81.6200 },
+    { id: "Res-Gudhiyari-B", lat: 21.2610, lng: 81.6140 },
+    { id: "Res-Gudhiyari-C", lat: 21.2652, lng: 81.6230 },
+    { id: "Res-Gudhiyari-D", lat: 21.2700, lng: 81.6158 },
+    { id: "Res-Gudhiyari-E", lat: 21.2628, lng: 81.6182 },
+
     // Hexagon 8 (Naya Raipur - Zone 1)
-    { id: "Res-NayaRaipur1-A", lat: 21.1635, lng: 81.7875 },
-    { id: "Res-NayaRaipur1-B", lat: 21.1625, lng: 81.7865 },
-    { id: "Res-NayaRaipur1-C", lat: 21.1632, lng: 81.7880 },
-    { id: "Res-NayaRaipur1-D", lat: 21.1640, lng: 81.7868 },
-    
+    { id: "Res-NayaRaipur1-A", lat: 21.1660, lng: 81.7900 },
+    { id: "Res-NayaRaipur1-B", lat: 21.1600, lng: 81.7840 },
+    { id: "Res-NayaRaipur1-C", lat: 21.1642, lng: 81.7930 },
+    { id: "Res-NayaRaipur1-D", lat: 21.1690, lng: 81.7858 },
+
     // Hexagon 9 (Naya Raipur - Zone 2)
-    { id: "Res-NayaRaipur2-A", lat: 21.1595, lng: 81.7835 },
-    { id: "Res-NayaRaipur2-B", lat: 21.1585, lng: 81.7825 },
-    { id: "Res-NayaRaipur2-C", lat: 21.1592, lng: 81.7840 },
-    { id: "Res-NayaRaipur2-D", lat: 21.1600, lng: 81.7828 },
-    { id: "Res-NayaRaipur2-E", lat: 21.1588, lng: 81.7832 },
-    
+    { id: "Res-NayaRaipur2-A", lat: 21.1620, lng: 81.7860 },
+    { id: "Res-NayaRaipur2-B", lat: 21.1560, lng: 81.7800 },
+    { id: "Res-NayaRaipur2-C", lat: 21.1602, lng: 81.7890 },
+    { id: "Res-NayaRaipur2-D", lat: 21.1650, lng: 81.7818 },
+    { id: "Res-NayaRaipur2-E", lat: 21.1578, lng: 81.7842 },
+
     // Hexagon 10 (Mowa)
-    { id: "Res-Mowa-A", lat: 21.2775, lng: 81.6625 },
-    { id: "Res-Mowa-B", lat: 21.2765, lng: 81.6615 },
-    { id: "Res-Mowa-C", lat: 21.2772, lng: 81.6630 },
-    { id: "Res-Mowa-D", lat: 21.2780, lng: 81.6618 },
-    
+    { id: "Res-Mowa-A", lat: 21.2800, lng: 81.6650 },
+    { id: "Res-Mowa-B", lat: 21.2740, lng: 81.6590 },
+    { id: "Res-Mowa-C", lat: 21.2782, lng: 81.6680 },
+    { id: "Res-Mowa-D", lat: 21.2830, lng: 81.6608 },
+
     // Hexagon 11 (DDU Nagar)
-    { id: "Res-DDUNagar-A", lat: 21.2375, lng: 81.5975 },
-    { id: "Res-DDUNagar-B", lat: 21.2365, lng: 81.5965 },
-    { id: "Res-DDUNagar-C", lat: 21.2372, lng: 81.5980 },
-    { id: "Res-DDUNagar-D", lat: 21.2380, lng: 81.5968 },
-    { id: "Res-DDUNagar-E", lat: 21.2368, lng: 81.5972 },
-    
+    { id: "Res-DDUNagar-A", lat: 21.2400, lng: 81.6000 },
+    { id: "Res-DDUNagar-B", lat: 21.2340, lng: 81.5940 },
+    { id: "Res-DDUNagar-C", lat: 21.2382, lng: 81.6030 },
+    { id: "Res-DDUNagar-D", lat: 21.2430, lng: 81.5958 },
+    { id: "Res-DDUNagar-E", lat: 21.2358, lng: 81.5982 },
+
     // Hexagon 12 (Tikrapara)
-    { id: "Res-Tikrapara-A", lat: 21.2305, lng: 81.6375 },
-    { id: "Res-Tikrapara-B", lat: 21.2295, lng: 81.6365 },
-    { id: "Res-Tikrapara-C", lat: 21.2302, lng: 81.6380 },
-    { id: "Res-Tikrapara-D", lat: 21.2310, lng: 81.6368 }
+    { id: "Res-Tikrapara-A", lat: 21.2330, lng: 81.6400 },
+    { id: "Res-Tikrapara-B", lat: 21.2270, lng: 81.6340 },
+    { id: "Res-Tikrapara-C", lat: 21.2312, lng: 81.6430 },
+    { id: "Res-Tikrapara-D", lat: 21.2360, lng: 81.6358 }
 ];
