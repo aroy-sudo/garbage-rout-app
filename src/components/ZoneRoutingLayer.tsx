@@ -17,17 +17,14 @@ const DEMO_ASSIGNED: AssignedPoint[] = SHGS.flatMap(shg => {
   return z ? [{ ...shg, zone: z }] : [];
 });
 
-// ─── Nearest recycler depot per hexagon ───────────────────────────────────────
-function nearestRecycler(center: LatLng): GeoPoint {
-  return RECYCLERS.reduce((best, r) => {
-    const d = Math.hypot(r.lat - center[0], r.lng - center[1]);
-    const bd = Math.hypot(best.lat - center[0], best.lng - center[1]);
-    return d < bd ? r : best;
-  }, RECYCLERS[0]);
+// ─── Recycler strictly inside hexagon ─────────────────────────────────────────
+function recyclerInZone(zoneId: string): GeoPoint | null {
+  // Finds the first recycler that geometrically falls inside this zone's polygon
+  return RECYCLERS.find(r => getZoneForPoint(r.lat, r.lng, ZONES)?.id === zoneId) || null;
 }
 
-const ZONE_DEPOTS: Record<string, GeoPoint> = Object.fromEntries(
-  ZONES.map(z => [z.id, nearestRecycler(z.center)])
+const ZONE_DEPOTS: Record<string, GeoPoint | null> = Object.fromEntries(
+  ZONES.map(z => [z.id, recyclerInZone(z.id)])
 );
 
 // ─── Depot icon ────────────────────────────────────────────────────────────────
@@ -138,10 +135,13 @@ export default function ZoneRoutingLayer({
     });
   }, [livePickups]);
 
-  const allAssigned = useMemo(
-    () => [...DEMO_ASSIGNED, ...liveAssigned],
-    [liveAssigned]
-  );
+  const allAssigned = useMemo(() => {
+    // Merge and deduplicate by ID so React doesn't complain about duplicate keys
+    const combined = [...DEMO_ASSIGNED, ...liveAssigned];
+    const unique = new Map<string, AssignedPoint>();
+    combined.forEach(p => unique.set(p.id, p));
+    return Array.from(unique.values());
+  }, [liveAssigned]);
 
   // ── Called when user clicks "Route Zone" button in a depot popup ────────────
   const handleRouteZone = async (zoneId: string) => {
@@ -215,38 +215,14 @@ export default function ZoneRoutingLayer({
                 <br />
                 👥 SHGs: {shgsInZone.length}
                 <br />
-                ♻️ Click recycler to route
+                ♻️ {ZONE_DEPOTS[zone.id] ? "Click recycler to route" : "No recycler in zone (No route)"}
               </div>
             </Tooltip>
           </Polygon>
         );
       })}
 
-      {/* ── Zone center label (permanent) ───────────────────────────────── */}
-      {ZONES.map(zone => (
-        <CircleMarker
-          key={`lbl-${zone.id}`}
-          center={zone.center}
-          radius={0}
-          pathOptions={{ opacity: 0, fillOpacity: 0 }}
-        >
-          <Tooltip permanent direction="center">
-            <span style={{
-              color: zone.color,
-              fontWeight: 700,
-              fontSize: 11,
-              background: "rgba(255,255,255,0.92)",
-              padding: "2px 7px",
-              borderRadius: 5,
-              border: `1.5px solid ${zone.color}`,
-              whiteSpace: "nowrap",
-              pointerEvents: "none",
-            }}>
-              {zone.label}
-            </span>
-          </Tooltip>
-        </CircleMarker>
-      ))}
+
 
       {/* ── Road-following route polylines (one per zone, on demand) ────── */}
       {ZONES.map(zone => {
@@ -261,8 +237,8 @@ export default function ZoneRoutingLayer({
         );
       })}
 
-      {/* ── SHG pickup dots ─────────────────────────────────────────────── */}
-      {allAssigned.map(shg => (
+      {/* ─── SHG pickup dots (demo data) ────────────────────────────────── */}
+      {allAssigned.filter(shg => !shg.id.toString().match(/^[0-9a-f]{8}-/i)).map(shg => (
         <CircleMarker
           key={`shg-${shg.id}`}
           center={[shg.lat, shg.lng]}
@@ -282,6 +258,22 @@ export default function ZoneRoutingLayer({
             </div>
           </Tooltip>
         </CircleMarker>
+      ))}
+
+      {/* ─── Live Pickups (drop pins) ──────────────────────────────────── */}
+      {allAssigned.filter(shg => shg.id.toString().match(/^[0-9a-f]{8}-/i)).map(shg => (
+        <Marker
+          key={`live-${shg.id}`}
+          position={[shg.lat, shg.lng]}
+        >
+          <Tooltip direction="top" sticky>
+            <div style={{ fontSize: 11 }}>
+              <strong>📍 Live Pickup</strong>
+              <br />
+              <span style={{ color: shg.zone.color }}>{shg.zone.label}</span>
+            </div>
+          </Tooltip>
+        </Marker>
       ))}
 
       {/* ── Depot ♻ markers — CLICK to get "Route Zone" popup ─────────── */}

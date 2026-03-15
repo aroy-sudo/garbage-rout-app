@@ -257,33 +257,8 @@ const ResidentMap = () => {
         {/* ─── 4-Zone grid (resident view, no routing lines) ─── */}
         <ZoneRoutingLayer livePickups={activePickups} showRoutes={false} />
 
-        {/* Render Waste Recycler Station Markers */}
-        {RECYCLERS.map((recycler) => (
-            <Marker
-                key={recycler.id}
-                position={[recycler.lat, recycler.lng]}
-                icon={RecyclerIcon}
-            >
-               <Popup>
-                  <strong>♻️ Waste Recycler</strong><br/>
-                  <span className="font-mono text-xs text-green-700">{recycler.id}</span>
-               </Popup>
-            </Marker>
-        ))}
-
         {/* Render Pending Pickups from Supabase */}
-        {activePickups.map((shg) => (
-            <Marker
-                key={shg.id}
-                position={[shg.lat, shg.lng]}
-                icon={SHGIcon}
-            >
-               <Popup>
-                  <strong>📍 Pending Pickup</strong><br/>
-                  SHG: <span className="font-mono text-xs">{shg.id}</span>
-               </Popup>
-            </Marker>
-        ))}
+        {/* Now handled by ZoneRoutingLayer Drop-Pins! */}
 
         {/* Render Animated Dummy Collector Trucks */}
         {dummyTrucks.map(truck => (
