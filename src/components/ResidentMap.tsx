@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import MovingTruck from './MovingTruck';
 import { GeoPoint, SHGS, RECYCLERS } from '@/src/lib/demoData';
+import ZoneRoutingLayer from './ZoneRoutingLayer';
 
 // Custom Leaflet Recycler Icon using an inline SVG
 const recyclerSvg = encodeURIComponent(`
@@ -76,7 +77,7 @@ const ResidentMap = () => {
   const usedSHGIds = useRef<Set<string>>(new Set());
 
   // Center exactly on Raipur based on the new user provided data
-  const mapCenter: [number, number] = [21.2510, 81.6350];
+  const mapCenter: [number, number] = [21.2497, 81.6050];
   const mapZoom = 12;
 
   // Initialize data on mount
@@ -236,6 +237,9 @@ const ResidentMap = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
+
+        {/* ─── 4-Zone grid (resident view, no routing lines) ─── */}
+        <ZoneRoutingLayer livePickups={activePickups} showRoutes={false} />
 
         {/* Render Waste Recycler Station Markers */}
         {RECYCLERS.map((recycler) => (
