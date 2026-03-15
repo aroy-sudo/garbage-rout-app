@@ -18,6 +18,7 @@ import {
   XCircle,
 } from "@phosphor-icons/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import FAQSection from "@/src/components/FAQSection";
 
 const AdminMap = dynamic(() => import("@/src/components/AdminMap"), {
   ssr: false,
@@ -144,13 +145,27 @@ export default function AdminDashboard() {
     <div className="space-y-6">
 
       {/* ── Page Heading ── */}
-        <div className="mb-2 pb-4 border-b border-purple-100">
-          <h1 className="text-4xl font-extrabold tracking-tight text-purple-900 dark:text-purple-400 mb-2">
-            Admin Dashboard
-          </h1>
-          <p className="text-lg text-zinc-600 dark:text-zinc-400">
-            Oversee district-wide waste operations, monitor SHG performance, and manage field teams in real-time.
-          </p>
+        <div className="mb-2 pb-4 border-b border-purple-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-4xl font-extrabold tracking-tight text-purple-900 dark:text-purple-400 mb-2">
+              Admin Dashboard
+            </h1>
+            <p className="text-lg text-zinc-600 dark:text-zinc-400">
+              Oversee district-wide waste operations, monitor SHG performance, and manage field teams in real-time.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <a 
+              href="#faq" 
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="text-sm font-semibold text-purple-900 hover:text-purple-700 transition-colors cursor-pointer bg-purple-50 px-4 py-2 rounded-xl"
+            >
+              FAQ
+            </a>
+          </div>
         </div>
 
         {/* ── KPI Cards ── */}
@@ -442,6 +457,9 @@ export default function AdminDashboard() {
 
           </div>
         </div>
+        
+        {/* Universal FAQ Section */}
+        <FAQSection />
     </div>
   );
 }

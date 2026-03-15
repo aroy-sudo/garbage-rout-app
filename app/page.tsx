@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Leaf, Navigation, BarChart3, ShieldCheck } from "lucide-react";
+import FaqSection from "@/components/FaqSection";
+import InitiativesSection from "@/components/InitiativesSection";
 
 export default function Home() {
   return (
@@ -24,6 +26,8 @@ export default function Home() {
           <nav className="hidden md:flex items-center gap-6">
             <Link href="#features" className="text-sm font-medium text-zinc-600 hover:text-emerald-700 transition-colors">Features</Link>
             <Link href="#impact" className="text-sm font-medium text-zinc-600 hover:text-emerald-700 transition-colors">Impact</Link>
+            <Link href="#initiatives" className="text-sm font-medium text-zinc-600 hover:text-emerald-700 transition-colors">Initiatives</Link>
+            <Link href="#faq" className="text-sm font-medium text-zinc-600 hover:text-emerald-700 transition-colors">FAQ</Link>
             <Link href="/login">
               <Button variant="ghost" size="sm" className="rounded-full text-zinc-600 hover:text-emerald-700">Sign In</Button>
             </Link>
@@ -150,6 +154,12 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Initiatives Section */}
+        <InitiativesSection />
+
+        {/* FAQ Section */}
+        <FaqSection />
 
         {/* Dev Bypass Section */}
         <section className="bg-zinc-100 py-12 dark:bg-zinc-900/50">
