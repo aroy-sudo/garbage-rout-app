@@ -10,6 +10,7 @@ import MovingTruck from "./MovingTruck";
 import L from "leaflet";
 import { useRouter } from 'next/navigation';
 import { RECYCLERS } from "@/src/lib/demoData";
+import ZoneRoutingLayer from "./ZoneRoutingLayer";
 
 type PickupRequest = {
   id: string;
@@ -43,8 +44,8 @@ const RecyclerIcon = L.icon({
   popupAnchor: [0, -22],
 });
 
-const FALLBACK_LOCATION: [number, number] = [21.1938, 81.3509];
-const MAP_CENTER: [number, number] = [21.1938, 81.3509];
+const FALLBACK_LOCATION: [number, number] = [21.2497, 81.6050];
+const MAP_CENTER: [number, number] = [21.2497, 81.6050];
 
 // ORS ROUTE FETCHER (ONLY ROUTING LOGIC)
 const fetchORSRoute = async (
@@ -108,7 +109,7 @@ const CollectorMap = () => {
   const depotLocation: [number, number] = driverPosition || FALLBACK_LOCATION;
 
   const mapCenter: [number, number] = MAP_CENTER;
-  const mapZoom = 13;
+  const mapZoom = 12;
 
   // FETCH PICKUP REQUESTS
   const fetchPickupRequests = async () => {
@@ -290,6 +291,9 @@ const CollectorMap = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
         />
+
+        {/* ─── 4-Zone routing grid ─────────────────────────────────── */}
+        <ZoneRoutingLayer livePickups={pickupRequests.map(r => ({ id: r.id, lat: r.latitude, lng: r.longitude }))} showRoutes={true} />
 
         {/* GPS CONTROLS */}
 
