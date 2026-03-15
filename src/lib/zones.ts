@@ -1,4 +1,5 @@
 import * as turf from "@turf/turf";
+import booleanPointInPolygon from "@turf/boolean-point-in-polygon";
 
 export type LatLng = [number, number]; // [lat, lng]
 
@@ -38,7 +39,7 @@ const hexPoly = turf.polygon([[...BIG_HEX_COORDS.map(p => [p[1], p[0]])]]);
 
 export function insideHex(lat: number, lng: number): boolean {
   const pt = turf.point([lng, lat]);
-  return turf.booleanPointInPolygon(pt, hexPoly);
+  return booleanPointInPolygon(pt, hexPoly);
 }
 
 // ─── Shim for old 7-zone functions so existing code won't break ──────────────

@@ -5,7 +5,7 @@ import { logOut } from "../actions"; // Import your new server action
 import { Button } from "@/components/ui/button";
 import AnalyticsDashboard from "@/src/components/AnalyticsDashboard";
 import PickupStatusTable from "@/src/components/PickupStatusTable";
-import { WasteChatbot } from "@/src/components/WasteChatbot";
+import GarbageChatBot from "@/src/components/GarbageChatBot";
 import { Leaf } from "lucide-react";
 import Link from "next/link";
 import PaymentPopup from "@/src/components/PaymentPopup";
@@ -73,8 +73,7 @@ export default function ResidentDashboard() {
             <PickupStatusTable />
           </div>
         </div>
-
-        <WasteChatbot />
+        <GarbageChatBot />
         <PaymentPopup />
         <FAQSection />
       </main>

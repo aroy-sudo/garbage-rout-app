@@ -1,68 +1,54 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
+
+const GROQ_API_KEY = process.env.GROQ_API_KEY!;
+const GROQ_BASE = "https://api.groq.com/openai/v1";
 
 export async function POST(req: NextRequest) {
   try {
-    const { message } = await req.json();
+    const { messages } = await req.json();
 
-    if (!message) {
-      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
-    }
+    const response = await fetch(`${GROQ_BASE}/chat/completions`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${GROQ_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          {
+            role: "system",
+            content: `You are a helpful customer support assistant for a garbage route management app. 
+You help residents with:
+- Garbage and recycling collection schedules
+- Route information and changes
+- Missed pickups and complaints
+- Waste disposal guidelines (what goes in which bin)
+- Holiday schedule changes
+- Special bulk waste collection requests
+- Account and billing queries
 
-    // 1. Your customized EcoRoute context
-    const systemPrompt = `You are EcoBot, the official AI Waste Management Assistant for the Bhilai Municipal Corporation and the EcoRoute platform. Your goal is to help residents properly segregate waste and schedule pickups. 
-
-Knowledge Base:
-- Wet Waste: Food scraps, vegetable peels, leaves (Green Bin). Advise composting or handing to daily municipal collectors.
-- Dry Waste: Paper, cardboard, clean glass, metal (Blue Bin).
-- Plastic Waste: Tell users they do NOT need to throw plastic in the regular trash. They should schedule a dedicated plastic pickup via the EcoRoute Telegram bot or their Resident Dashboard.
-- Hazardous/E-Waste: Batteries, medical waste, electronics, chemicals (Red Bin). Drop off at Nehru Nagar Hub or Sector 6 Depot.
-
-Guidelines: 
-- Keep your answers short, friendly, and direct (under 3 sentences).
-- Never hallucinate rules outside of this context.
-- Always encourage using the EcoRoute app for plastic pickups.`;
-
-    // 2. Using the new Hugging Face Router endpoint
-    const response = await fetch(
-      "https://router.huggingface.co/v1/chat/completions",
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-        body: JSON.stringify({
-          model: "Qwen/Qwen2.5-72B-Instruct",
-          messages: [
-            { role: "system", "content": systemPrompt },
-            { role: "user", "content": message }
-          ],
-          max_tokens: 150,
-          temperature: 0.3,
-          stream: false
-        }),
-      }
-    );
+Be friendly, concise, and empathetic. If you don't know specific route details, 
+ask for the resident's address or area so you can assist better. 
+Always aim to resolve issues in as few messages as possible.`,
+          },
+          ...messages,
+        ],
+        temperature: 0.7,
+        max_tokens: 512,
+      }),
+    });
 
     if (!response.ok) {
-      const errorBody = await response.text();
-      console.error("Hugging Face API Error:", errorBody);
-      return NextResponse.json({ error: 'Failed to fetch from Hugging Face API', details: errorBody }, { status: response.status });
+      const err = await response.text();
+      return NextResponse.json({ error: err }, { status: response.status });
     }
 
-    const result = await response.json();
-    
-    // 3. Parsing the OpenAI-compatible response format
-    if (result.choices && result.choices.length > 0 && result.choices[0].message?.content) {
-      const generatedText = result.choices[0].message.content.trim();
-      return NextResponse.json({ reply: generatedText });
-    } else {
-      console.error("Unexpected JSON format:", result);
-      return NextResponse.json({ error: 'Unexpected response format from Hugging Face API' }, { status: 500 });
-    }
-
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content ?? "Sorry, I could not generate a response.";
+    return NextResponse.json({ reply });
   } catch (error) {
-    console.error("API Route Error:", error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error("Chat API error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
