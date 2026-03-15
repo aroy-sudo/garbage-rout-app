@@ -5,27 +5,26 @@ import { ChevronRight } from "lucide-react";
 
 const initiatives = [
   {
-    title: "Tetra Pak Initiative",
-    description: "The Kabadiwala collaborated with TetraPak India (World's Leading Beverage Carton Manufacturer) to increase the collection of used beverage cartons (UBC's) for recycling and diverting them from landfills.",
+    title: "Beverage Carton Recycling",
+    description: "Learn how used beverage cartons like juice and milk packs can be collected and recycled instead of being sent to landfills. Understand your role in driving circular economy at the community level.",
     videoSrc: "https://www.youtube.com/embed/6DYlz8NW554",
     link: "#"
   },
   {
-    title: "Mattress Circular Journey",
-    description: "ISPF, IPUA and The Kabadiwala came together to initiate India's first mattress recycling campaign which is named as 'Feko Nahi Recycle Karo'. The objective is to encourage the community to practise sustainable disposal of Mattress.",
+    title: "Don't Throw — Recycle!",
+    description: "Discover how old mattresses can be responsibly recycled through India's first mattress recycling campaign. See how communities can shift from dumping to sustainable disposal practices.",
     videoSrc: "https://www.youtube.com/embed/P5OBWbZDZIc",
     link: "#"
   },
   {
-    title: "Tree Plantation Initiative",
-    description: "Since the last two years, The Kabadiwala has been following a tradition of planting trees on the occasion of Mahatma Gandhi's Birthday. In which, our customers also take part in our mission to turn Bhopal greener.",
+    title: "Green Bhopal: Tree Plantation Drive",
+    description: "Watch how communities come together to plant trees and restore green cover in urban and rural areas. Every tree planted is a step toward cleaner air and a healthier environment for future generations.",
     videoSrc: "https://www.youtube.com/embed/0ZiD_Lb3Tm0",
     link: "#"
   },
   {
-    title: "Kitab Ghar",
-    description: "Kitab Ghar initiative is a combined effort of The Kabadiwala & Bhopal Municipal Corporation that aims at providing second hand books to the underprivileged children by acquiring them from the people who no longer need them.",
-    // Using one of the provided YouTube embeds as a placeholder for the Pexels link, as direct iframe embedding of the Pexels page is typically blocked.
+    title: "Books for All: Kitab Ghar",
+    description: "See how old textbooks and books are collected from households and redistributed to underprivileged rural children. A simple act of giving away books creates a lasting impact on rural education.",
     videoSrc: "https://www.youtube.com/embed/0ZiD_Lb3Tm0", 
     link: "https://www.pexels.com/video/people-working-in-a-plastic-factory-for-recycle-3196563/"
   }
@@ -36,9 +35,9 @@ export default function InitiativesSection() {
     <section id="initiatives" className="py-24 bg-black text-white overflow-hidden scroll-mt-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight">Our Initiatives</h2>
+          <h2 className="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight">Rural Awareness</h2>
           <p className="text-zinc-400 text-lg">
-            Small steps towards <span className="text-emerald-500">sustainability.</span>
+            Educate and <span className="text-emerald-500">Implement.</span>
           </p>
         </div>
 
