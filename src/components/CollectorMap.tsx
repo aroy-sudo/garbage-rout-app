@@ -357,52 +357,7 @@ const CollectorMap = () => {
 
         <MovingTruck position={driverPosition || FALLBACK_LOCATION} />
 
-        {/* RECYCLER STATION MARKERS */}
-        {RECYCLERS.map((recycler) => (
-          <Marker
-            key={recycler.id}
-            position={[recycler.lat, recycler.lng]}
-            icon={RecyclerIcon}
-          >
-            <Popup>
-              <strong>♻️ Waste Recycler Station</strong><br/>
-              <span className="font-mono text-xs text-green-700">{recycler.id}</span>
-            </Popup>
-          </Marker>
-        ))}
 
-        {/* PICKUP MARKERS */}
-
-        {pickupRequests.map((request) => (
-
-          <Marker
-            key={request.id}
-            position={[request.latitude, request.longitude]}
-          >
-
-            <Popup className="collector-popup">
-
-              <div className="text-center p-2 min-w-[150px]">
-
-                <p className="font-semibold text-zinc-900 mb-3">
-                  Plastic Reported
-                </p>
-
-                <Button 
-                  size="sm" 
-                  onClick={() => router.push(`/dashboard/collector/pickup/${request.id}`)} 
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
-                >
-                  📝 Process Pickup
-                </Button>
-
-              </div>
-
-            </Popup>
-
-          </Marker>
-
-        ))}
 
       </MapContainer>
 
