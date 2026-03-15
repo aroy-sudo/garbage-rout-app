@@ -24,11 +24,11 @@ const chartData = [
 const chartConfig = {
   plastic: {
     label: "Plastic Collected (kg)",
-    color: "#059669", // Emerald-600
+    color: "#3da35d", // Emerald/Jade from custom palette
   },
   earnings: {
     label: "Earnings (Rs)",
-    color: "#d97706", // Amber-600
+    color: "#96e072", // Light Lime Green from custom palette
   }
 } satisfies ChartConfig;
 
@@ -37,54 +37,66 @@ export default function AnalyticsDashboard() {
     <div className="w-full space-y-6 mb-8">
       {/* Top Row: KPI Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Plastic Recovered</CardTitle>
-            <Recycle className="h-4 w-4 text-emerald-600" />
+        <Card className="rounded-2xl border-0 shadow-md shadow-[#134611]/10 overflow-hidden bg-gradient-to-br from-[#e8fccf] to-[#e8fccf]/60 relative group cursor-default transition-transform hover:-translate-y-0.5">
+          <div className="absolute -bottom-5 -right-5 w-28 h-28 rounded-full bg-white/30 blur-sm" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-medium text-[#134611]">Total Plastic Recovered</CardTitle>
+            <div className="p-2 rounded-xl bg-[#3da35d] shadow-lg">
+              <Recycle className="h-4 w-4 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">3,250 kg</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+          <CardContent className="relative z-10">
+            <div className="text-2xl font-bold text-[#134611]">3,250 kg</div>
+            <p className="text-xs text-[#3e8914]">+20.1% from last month</p>
           </CardContent>
         </Card>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">CO2 Emissions Avoided</CardTitle>
-            <Leaf className="h-4 w-4 text-emerald-600" />
+        <Card className="rounded-2xl border-0 shadow-md shadow-[#134611]/10 overflow-hidden bg-gradient-to-br from-[#96e072]/30 to-[#96e072]/10 relative group cursor-default transition-transform hover:-translate-y-0.5">
+          <div className="absolute -bottom-5 -right-5 w-28 h-28 rounded-full bg-white/30 blur-sm" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-medium text-[#134611]">CO2 Emissions Avoided</CardTitle>
+            <div className="p-2 rounded-xl bg-[#3e8914] shadow-lg">
+              <Leaf className="h-4 w-4 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">4,875 kg</div>
-            <p className="text-xs text-muted-foreground">+12% vs open burning</p>
+          <CardContent className="relative z-10">
+            <div className="text-2xl font-bold text-[#134611]">4,875 kg</div>
+            <p className="text-xs text-[#3e8914]">+12% vs open burning</p>
           </CardContent>
         </Card>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">SHG Earnings Distributed</CardTitle>
-            <IndianRupee className="h-4 w-4 text-emerald-600" />
+        <Card className="rounded-2xl border-0 shadow-md shadow-[#134611]/10 overflow-hidden bg-gradient-to-br from-[#e8fccf] to-[#e8fccf]/60 relative group cursor-default transition-transform hover:-translate-y-0.5">
+          <div className="absolute -bottom-5 -right-5 w-28 h-28 rounded-full bg-white/30 blur-sm" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-medium text-[#134611]">SHG Earnings Distributed</CardTitle>
+            <div className="p-2 rounded-xl bg-[#3da35d] shadow-lg">
+              <IndianRupee className="h-4 w-4 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">₹ 65,000</div>
-            <p className="text-xs text-muted-foreground">Across 12 villages</p>
+          <CardContent className="relative z-10">
+            <div className="text-2xl font-bold text-[#134611]">₹ 65,000</div>
+            <p className="text-xs text-[#3e8914]">Across 12 villages</p>
           </CardContent>
         </Card>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Collection Routes</CardTitle>
-            <TrendingUp className="h-4 w-4 text-emerald-600" />
+        <Card className="rounded-2xl border-0 shadow-md shadow-[#134611]/10 overflow-hidden bg-gradient-to-br from-[#96e072]/30 to-[#96e072]/10 relative group cursor-default transition-transform hover:-translate-y-0.5">
+          <div className="absolute -bottom-5 -right-5 w-28 h-28 rounded-full bg-white/30 blur-sm" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-medium text-[#134611]">Active Collection Routes</CardTitle>
+            <div className="p-2 rounded-xl bg-[#3e8914] shadow-lg">
+              <TrendingUp className="h-4 w-4 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">Optimized daily by AI</p>
+          <CardContent className="relative z-10">
+            <div className="text-2xl font-bold text-[#134611]">8</div>
+            <p className="text-xs text-[#3e8914]">Optimized daily by AI</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Bottom Row: The Modern Charts */}
       <div className="grid gap-4 md:grid-cols-2">
-        <Card>
+        <Card className="border-[#e8fccf] shadow-sm">
           <CardHeader>
             <CardTitle>Collection Volume (Last 6 Months)</CardTitle>
           </CardHeader>
@@ -111,10 +123,10 @@ export default function AnalyticsDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-[#e8fccf] shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle>Money Earned Through Recycling</CardTitle>
-            <Wallet className="h-4 w-4 text-amber-600" />
+            <Wallet className="h-4 w-4 text-[#3e8914]" />
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="min-h-[250px] w-full max-h-[300px]">

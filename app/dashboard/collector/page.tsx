@@ -7,6 +7,7 @@ import PickupStatusTable from "@/src/components/PickupStatusTable";
 import { Leaf } from "lucide-react";
 import Link from "next/link";
 import CollectorAnalytics from "@/src/components/CollectorAnalytics";
+import FAQSection from "@/src/components/FAQSection";
 
 // Safely import the map for the client side only
 const CollectorMap = dynamic(() => import("@/src/components/CollectorMap"), {
@@ -26,9 +27,21 @@ export default function CollectorDashboard() {
             </div>
             <Link href="/" className="text-2xl font-bold tracking-tight text-emerald-900 dark:text-emerald-400">EcoRoute</Link>
           </div>
-          <form action={logOut}>
-            <Button size="sm" className="bg-emerald-700 hover:bg-emerald-800 text-white rounded-full shadow-md shadow-emerald-900/10">Sign Out</Button>
-          </form>
+          <div className="flex items-center space-x-4">
+            <a 
+              href="#faq" 
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="text-sm font-semibold text-emerald-900 hover:text-emerald-700 transition-colors cursor-pointer"
+            >
+              FAQ
+            </a>
+            <form action={logOut}>
+              <Button size="sm" className="bg-emerald-700 hover:bg-emerald-800 text-white rounded-full shadow-md shadow-emerald-900/10">Sign Out</Button>
+            </form>
+          </div>
         </div>
       </header>
 
@@ -57,6 +70,8 @@ export default function CollectorDashboard() {
             <PickupStatusTable />
           </div>
         </div>
+
+        <FAQSection />
       </main>
     </div>
   );
