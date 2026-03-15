@@ -225,11 +225,27 @@ const ResidentMap = () => {
 
   return (
     <div className="w-full h-full flex flex-col relative">
-      {/* Floating button over the map for a cooler UI */}
-      <div className="absolute top-4 right-4 z-[1000]">
-        <Button onClick={simulateMissedCall} className="shadow-lg">
-          📞 Simulate Missed Call
-        </Button>
+      {/* Floating Request Pickup Box */}
+      <div className="absolute top-4 right-4 z-[1000] w-72">
+        <div className="bg-white/95 backdrop-blur-md border border-[#e8fccf] shadow-xl shadow-[#134611]/10 rounded-2xl p-4 flex flex-col gap-3">
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-[#e8fccf] text-[#3e8914] rounded-lg mt-0.5">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm40-88a8,8,0,0,1-8,8H136v24a8,8,0,0,1-16,0V136H96a8,8,0,0,1,0-16h24V96a8,8,0,0,1,16,0v24h24A8,8,0,0,1,168,128Z"></path></svg>
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-[#134611]">Test the System</h3>
+              <p className="text-[10px] text-[#3e8914]/80 leading-tight mt-0.5">
+                Click below to simulate a resident calling the toll-free number. A new pickup will instantly appear on the map and route to the nearest collector.
+              </p>
+            </div>
+          </div>
+          <Button 
+            onClick={simulateMissedCall} 
+            className="w-full bg-[#3e8914] hover:bg-[#134611] text-white shadow-md transition-all font-semibold rounded-xl"
+          >
+            Request Pickup
+          </Button>
+        </div>
       </div>
 
       <MapContainer center={mapCenter} zoom={mapZoom} className="h-full w-full min-h-[500px] z-0">

@@ -93,8 +93,8 @@ export default function PickupStatusTable() {
                     variant={req.status === "collected" ? "default" : "secondary"}
                     className={
                       req.status === "collected"
-                        ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-none"
-                        : "bg-orange-100 text-orange-800 hover:bg-orange-100 border-none"
+                        ? "bg-[#e8fccf] text-[#134611] hover:bg-[#96e072]/50 border-none"
+                        : "bg-[#96e072]/30 text-[#3e8914] hover:bg-[#96e072]/50 border-none"
                     }
                   >
                     {req.status === "collected" ? "Collected" : "Pending AI Route"}
@@ -109,7 +109,7 @@ export default function PickupStatusTable() {
   );
 
   return (
-    <Card className="w-full shadow-sm">
+    <Card className="w-full shadow-sm border-[#e8fccf]">
       <CardHeader className="flex flex-row items-center justify-between pb-4">
         <div>
           <CardTitle>Collection Activity Log</CardTitle>
