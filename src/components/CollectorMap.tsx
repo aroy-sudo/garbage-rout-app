@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
+import { MapContainer, Marker, Popup, Polyline } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import OfflineTileLayer from "./OfflineTileLayer";
 import { createClient } from "@/src/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import MovingTruck from "./MovingTruck";
 import L from "leaflet";
-import { useRouter } from 'next/navigation';
-import { RECYCLERS } from "@/src/lib/demoData";
 import ZoneRoutingLayer from "./ZoneRoutingLayer";
+import { useDriverTracking } from "@/src/hooks/useDriverTracking";
+import { isWithinRadius } from "@/src/utils/geofencing";
 
 type PickupRequest = {
   id: string;
@@ -28,21 +29,6 @@ const DefaultIcon = L.icon({
 });
 
 L.Marker.prototype.options.icon = DefaultIcon;
-
-// Waste Recycler SVG icon (green recycling symbol)
-const recyclerSvg = encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="40" height="40">
-  <circle cx="24" cy="24" r="22" fill="#16a34a" stroke="white" stroke-width="2"/>
-  <text x="24" y="30" font-size="22" text-anchor="middle" fill="white">♻</text>
-</svg>
-`);
-
-const RecyclerIcon = L.icon({
-  iconUrl: `data:image/svg+xml,${recyclerSvg}`,
-  iconSize: [40, 40],
-  iconAnchor: [20, 20],
-  popupAnchor: [0, -22],
-});
 
 const FALLBACK_LOCATION: [number, number] = [21.2497, 81.6050];
 const MAP_CENTER: [number, number] = [21.2497, 81.6050];
@@ -95,7 +81,6 @@ const fetchORSRoute = async (
 };
 
 const CollectorMap = () => {
-
   const supabase = createClient();
 
   const [pickupRequests, setPickupRequests] = useState<PickupRequest[]>([]);
@@ -103,17 +88,31 @@ const CollectorMap = () => {
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [quotaExceeded, setQuotaExceeded] = useState(false);
 
+  // Driver GPS State & Telemetry Hook Integration
   const [driverPosition, setDriverPosition] = useState<[number, number] | null>(null);
   const [isTrackingLocation, setIsTrackingLocation] = useState(false);
+  const [routeId, setRouteId] = useState<string | null>(null);
 
-  const depotLocation: [number, number] = driverPosition || FALLBACK_LOCATION;
+  const { location, error: trackingError } = useDriverTracking(routeId, isTrackingLocation);
+
+  // Prevent multiple arrival triggers due to boundary GPS drifts
+  const [hasArrived, setHasArrived] = useState(false);
+
+  // Compute live active driver coordinates prioritising hook telemetry
+  const currentLatLng = useMemo<[number, number] | null>(() => {
+    if (location) {
+      return [location.lat, location.lng];
+    }
+    return driverPosition;
+  }, [location, driverPosition]);
+
+  const depotLocation: [number, number] = currentLatLng || FALLBACK_LOCATION;
 
   const mapCenter: [number, number] = MAP_CENTER;
   const mapZoom = 12;
 
   // FETCH PICKUP REQUESTS
-  const fetchPickupRequests = async () => {
-
+  const fetchPickupRequests = useCallback(async () => {
     const { data, error } = await supabase
       .from("pickup_requests")
       .select("*")
@@ -122,69 +121,54 @@ const CollectorMap = () => {
     if (!error && data) {
       setPickupRequests(data as PickupRequest[]);
     }
+  }, [supabase]);
 
-  };
-
+  // Periodic polling for new pending pickup requests
   useEffect(() => {
-
-    fetchPickupRequests();
-
+    const timer = setTimeout(() => {
+      fetchPickupRequests();
+    }, 0);
     const interval = setInterval(fetchPickupRequests, 5000);
-
-    return () => clearInterval(interval);
-
-  }, []);
-
-  const router = useRouter();
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
+  }, [fetchPickupRequests]);
 
   // ORS ROUTE LOGIC
   const getOptimizedRoute = useCallback(async () => {
-
     if (pickupRequests.length === 0 || quotaExceeded) return [];
 
     try {
-
       const route = await fetchORSRoute(pickupRequests, depotLocation);
-
       toast.success("Route generated using OpenRouteService");
-
       return route;
-
-    } catch (error: any) {
-
+    } catch (error) {
       console.error("Route fetch failed", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to fetch route from ORS";
 
-      if (error?.message?.includes("Quota exceeded") || error?.message?.includes("403")) {
+      if (errorMessage.includes("Quota exceeded") || errorMessage.includes("403")) {
         setQuotaExceeded(true);
         toast.error("ORS Quota Exceeded. Routing disabled for now.");
       } else {
-        toast.error("Failed to fetch route from ORS");
+        toast.error(errorMessage);
       }
 
       return [];
-
     }
-
   }, [pickupRequests, depotLocation, quotaExceeded]);
 
   // UPDATE ROUTE
   const updateRoute = useCallback(async () => {
-
     if (pickupRequests.length === 0) {
-
       setRoutePath([]);
       return;
-
     }
 
     setLoadingRoute(true);
-
     const path = await getOptimizedRoute();
-
     setRoutePath(path);
-
     setLoadingRoute(false);
-
   }, [pickupRequests, getOptimizedRoute]);
 
   const prevRequestsStr = useRef<string>("");
@@ -192,7 +176,6 @@ const CollectorMap = () => {
 
   // AUTO ROUTE UPDATE
   useEffect(() => {
-
     const requestsStr = JSON.stringify(pickupRequests);
     const depotStr = JSON.stringify(depotLocation);
 
@@ -203,91 +186,107 @@ const CollectorMap = () => {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       updateRoute();
     }
-
   }, [pickupRequests, depotLocation, updateRoute]);
 
-  // GPS WATCHER
+  // Log tracking errors from geolocation hook
   useEffect(() => {
+    if (trackingError) {
+      toast.error(`GPS Error: ${trackingError}`);
+    }
+  }, [trackingError]);
 
-    if (!isTrackingLocation) return;
+  // AUTOMATED GEOFENCING SYSTEM
+  const nextPickupTarget = useMemo(() => {
+    if (pickupRequests.length === 0) return null;
+    // Logically, the next destination to service is the first one in the pending queue
+    const target = pickupRequests[0];
+    return {
+      id: target.id,
+      lat: target.latitude,
+      lng: target.longitude,
+    };
+  }, [pickupRequests]);
 
-    if (!navigator.geolocation) {
+  // Reset arrived status when target destination changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setHasArrived(false);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [nextPickupTarget?.id]);
 
-      toast.error("Geolocation not supported");
+  // Handle successful arrival status update
+  const handleArrival = useCallback(async (pickupId: string) => {
+    try {
+      const { error } = await supabase
+        .from("pickup_requests")
+        .update({ status: "collected" })
+        .eq("id", pickupId);
+
+      if (error) {
+        console.error("Failed to update pickup status in database:", error);
+        toast.error("Failed to update status for collection.");
+      } else {
+        toast.success("Collection completed successfully!");
+        fetchPickupRequests();
+      }
+    } catch (err) {
+      console.error("Arrival status update error:", err);
+      toast.error("An error occurred while finishing collection.");
+    }
+  }, [supabase, fetchPickupRequests]);
+
+  // Check geofence status dynamically
+  useEffect(() => {
+    if (!location || !nextPickupTarget || hasArrived) {
       return;
-
     }
 
-    const watchId = navigator.geolocation.watchPosition(
+    const targetCoords = { lat: nextPickupTarget.lat, lng: nextPickupTarget.lng };
+    const withinRadius = isWithinRadius(location, targetCoords, 50);
 
-      (position) => {
-
-        setDriverPosition([
-          position.coords.latitude,
-          position.coords.longitude,
-        ]);
-
-      },
-
-      (error) => {
-        console.warn("GPS error", error);
-      },
-
-      {
-        enableHighAccuracy: true,
-        maximumAge: 10000,
-        timeout: 5000,
-      }
-    );
-
-    return () => navigator.geolocation.clearWatch(watchId);
-
-  }, [isTrackingLocation]);
+    if (withinRadius) {
+      const timer = setTimeout(() => {
+        setHasArrived(true);
+        toast.success("Automatically arrived at destination (within 50m)!");
+        handleArrival(nextPickupTarget.id);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [location, nextPickupTarget, hasArrived, handleArrival]);
 
   // TOGGLE GPS
   const toggleLocationTracking = () => {
-
     if (isTrackingLocation) {
-
       setIsTrackingLocation(false);
+      setRouteId(null);
       setDriverPosition(null);
       toast.success("Location tracking stopped");
-
     } else {
-
+      setRouteId("route-raipur-01"); // Enable tracking with verified route identification
       setIsTrackingLocation(true);
       toast.success("Location tracking started");
-
     }
-
   };
 
   const startRoute = async () => {
-
-    if (!driverPosition) {
-
+    if (!currentLatLng) {
       toast.error("Enable location first");
       return;
-
     }
 
     toast.info("Starting route from current GPS");
-
     await updateRoute();
-
   };
 
   return (
-
     <div className="w-full h-full">
-
       <MapContainer
         center={mapCenter}
         zoom={mapZoom}
         className="h-full w-full min-h-[500px] z-0"
       >
-
-        <TileLayer
+        <OfflineTileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
         />
@@ -296,9 +295,7 @@ const CollectorMap = () => {
         <ZoneRoutingLayer livePickups={pickupRequests.map(r => ({ id: r.id, lat: r.latitude, lng: r.longitude }))} showRoutes={true} />
 
         {/* GPS CONTROLS */}
-
         <div className="absolute top-4 left-4 z-[1000] flex gap-2">
-
           <Button
             onClick={toggleLocationTracking}
             variant={isTrackingLocation ? "destructive" : "default"}
@@ -314,13 +311,10 @@ const CollectorMap = () => {
           >
             🚀 Start Route
           </Button>
-
         </div>
 
         {/* ROUTE */}
-
         {routePath.length > 0 && (
-
           <Polyline
             positions={routePath}
             pathOptions={{
@@ -329,42 +323,28 @@ const CollectorMap = () => {
               opacity: 0.9,
             }}
           />
-
         )}
+
         {/* LOADING MARKER */}
-
         {loadingRoute && !routePath.length && (
-
           <Marker position={mapCenter}>
             <Popup>Computing optimal route...</Popup>
           </Marker>
-
         )}
 
         {/* DRIVER MARKER */}
-
-        {driverPosition && (
-
-          <Marker position={driverPosition}>
-
+        {currentLatLng && (
+          <Marker position={currentLatLng}>
             <Popup>
               <strong>🚛 Driver Live GPS</strong>
             </Popup>
-
           </Marker>
-
         )}
 
-        <MovingTruck position={driverPosition || FALLBACK_LOCATION} />
-
-
-
+        <MovingTruck position={currentLatLng || FALLBACK_LOCATION} />
       </MapContainer>
-
     </div>
-
   );
-
 };
 
 export default CollectorMap;

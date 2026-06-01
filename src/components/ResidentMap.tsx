@@ -1,22 +1,15 @@
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import OfflineTileLayer from './OfflineTileLayer';
 import { createClient } from '@/src/utils/supabase/client';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import MovingTruck from './MovingTruck';
 import { GeoPoint, SHGS, RECYCLERS } from '@/src/lib/demoData';
 import ZoneRoutingLayer from './ZoneRoutingLayer';
-
-// Custom Leaflet Recycler Icon using an inline SVG
-const recyclerSvg = encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="40" height="40">
-  <circle cx="24" cy="24" r="22" fill="#16a34a" stroke="white" stroke-width="2"/>
-  <text x="24" y="30" font-size="22" text-anchor="middle" fill="white">♻</text>
-</svg>
-`);
 
 
 // Leaflet's default icon doesn't work well with React, so we need to fix it.
@@ -31,22 +24,6 @@ const DefaultIcon = L.icon({
 });
 
 L.Marker.prototype.options.icon = DefaultIcon;
-
-// Custom SHG icon (red dot)
-const SHGIcon = L.divIcon({
-  html: `<div style="background-color: #f43f5e; width: 14px; height: 14px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 4px rgba(0,0,0,0.4);"></div>`,
-  className: 'bg-transparent border-0',
-  iconSize: [18, 18],
-  iconAnchor: [9, 9]
-});
-
-// Waste Recycler icon - green recycling symbol
-const RecyclerIcon = L.icon({
-  iconUrl: `data:image/svg+xml,${recyclerSvg}`,
-  iconSize: [40, 40],
-  iconAnchor: [20, 20],
-  popupAnchor: [0, -22],
-});
 
 // Dummy truck type for animated collectors
 type DummyTruck = {
@@ -113,8 +90,8 @@ const ResidentMap = () => {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'pickup_requests' },
-        (payload: any) => {
-          const newRequest = payload.new as PickupRequest;
+        (payload: { new: PickupRequest }) => {
+          const newRequest = payload.new;
           if (newRequest.status === 'pending' && newRequest.latitude && newRequest.longitude) {
             const safeId = newRequest.user_id || `User-${newRequest.id}`;
             setActivePickups(prev => [
@@ -142,9 +119,12 @@ const ResidentMap = () => {
            speedMod: 0.8 + Math.random() * 0.5 // Random speed multiplier
         });
     }
-    setDummyTrucks(trucks);
+    const timer = setTimeout(() => {
+        setDummyTrucks(trucks);
+    }, 0);
 
     return () => {
+        clearTimeout(timer);
         supabase.removeChannel(subscription);
     };
   }, [supabase]);
@@ -249,7 +229,7 @@ const ResidentMap = () => {
       </div>
 
       <MapContainer center={mapCenter} zoom={mapZoom} className="h-full w-full min-h-[500px] z-0">
-        <TileLayer
+        <OfflineTileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />

@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Polygon, Marker, Popup } from 'react-leaflet';
+import { MapContainer, Polygon, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import OfflineTileLayer from './OfflineTileLayer';
 import { SHGS, RECYCLERS } from '@/src/lib/demoData';
 
 import L from 'leaflet';
@@ -99,7 +100,10 @@ export default function AdminMap() {
   const mapZoom = 12;
   const [isMounted, setIsMounted] = useState(false);
 
-  useEffect(() => { setIsMounted(true); }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => setIsMounted(true), 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   if (!isMounted) {
     return (
@@ -149,7 +153,7 @@ export default function AdminMap() {
       </div>
 
       <MapContainer center={mapCenter} zoom={mapZoom} className="h-full w-full z-0 font-sans" style={{ minHeight: '400px' }}>
-        <TileLayer
+        <OfflineTileLayer
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         />

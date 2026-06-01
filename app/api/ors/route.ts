@@ -1,13 +1,72 @@
 import { NextResponse } from "next/server";
+import { optimizePickupList, clusterPickups, CollectionNode } from "@/src/utils/routingIntelligence";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { coordinates } = body;
+    const { coordinates, pickups, depot, currentWeightLimit } = body;
 
-    if (!coordinates || !Array.isArray(coordinates)) {
+    let finalCoordinates: [number, number][] = coordinates;
+    let clusteredNodes: CollectionNode[] = [];
+
+    // Inject routing intelligence if pickups array is supplied
+    if (pickups && Array.isArray(pickups)) {
+      // 1. Filter out unprofitable pickups (<10kg true weight) and constrain by vehicle limits
+      const optimizedPickups = optimizePickupList(pickups, currentWeightLimit);
+
+      // 2. Cluster remaining pickups within a 2.0 km radius to optimize ORS waypoint limit
+      clusteredNodes = clusterPickups(optimizedPickups, 2.0);
+
+      // 3. Map clustered centroids to coordinates expected by ORS [lng, lat]
+      const optimizedCoords: [number, number][] = clusteredNodes.map((node) => [
+        node.longitude,
+        node.latitude,
+      ]);
+
+      // 4. Anchor route circular flow to start/end depot locations
+      if (depot && Array.isArray(depot)) {
+        finalCoordinates = [
+          depot as [number, number],
+          ...optimizedCoords,
+          depot as [number, number],
+        ];
+      } else if (coordinates && coordinates.length > 0) {
+        // Preserving legacy endpoints depot start/end markers
+        const startDepot = coordinates[0];
+        const endDepot = coordinates.length > 1 ? coordinates[coordinates.length - 1] : null;
+
+        const assembled: [number, number][] = [startDepot];
+        for (const coord of optimizedCoords) {
+          assembled.push(coord);
+        }
+        if (endDepot) {
+          assembled.push(endDepot);
+        }
+        finalCoordinates = assembled;
+      } else {
+        finalCoordinates = optimizedCoords;
+      }
+
+      // Short-circuit: If routing path doesn't yield enough profitable points
+      if (finalCoordinates.length < 2) {
+        return NextResponse.json(
+          { error: "No profitable pickups available", optimizedCount: 0 },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (!finalCoordinates || !Array.isArray(finalCoordinates)) {
       return NextResponse.json(
         { error: "Invalid or missing coordinates" },
+        { status: 400 }
+      );
+    }
+
+    // ORS demands at least 2 points
+    if (finalCoordinates.length < 2) {
+      return NextResponse.json(
+        { error: "At least 2 points are required to route" },
         { status: 400 }
       );
     }
@@ -26,7 +85,7 @@ export async function POST(req: Request) {
           Authorization: apiKey,
           "Content-Type": "application/json; charset=utf-8",
         },
-        body: JSON.stringify({ coordinates }),
+        body: JSON.stringify({ coordinates: finalCoordinates }),
       }
     );
 
@@ -40,7 +99,13 @@ export async function POST(req: Request) {
     }
 
     const data = await response.json();
-    return NextResponse.json(data);
+
+    // Spread the ORS response GeoJSON to maintain full backward compatibility,
+    // while attaching the clusteredNodes for the routing visual display.
+    return NextResponse.json({
+      ...data,
+      clusteredNodes,
+    });
   } catch (error) {
     console.error("ORS Proxy Error:", error);
     return NextResponse.json(

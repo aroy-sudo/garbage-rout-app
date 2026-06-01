@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Circle } from 'react-leaflet';
+import { MapContainer, Marker, Circle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import OfflineTileLayer from './OfflineTileLayer';
 import { createClient } from '@/src/utils/supabase/client';
 import { PickupRequest } from '@/src/types/database';
 import L from 'leaflet';
@@ -115,7 +116,7 @@ const WasteRecyclerMap = () => {
         zoom={mapZoom} 
         className="h-full w-full bg-zinc-100 dark:bg-zinc-900"
       >
-        <TileLayer
+        <OfflineTileLayer
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           attribution='&copy; <a href="https://carto.com/">CARTO</a>'
         />

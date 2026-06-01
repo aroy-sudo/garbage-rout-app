@@ -29,6 +29,15 @@ const AdminMap = dynamic(() => import("@/src/components/AdminMap"), {
   ),
 });
 
+const AdminHeatmap = dynamic(() => import("@/src/components/AdminHeatmap"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[500px] w-full flex items-center justify-center bg-muted rounded-xl animate-pulse">
+      Loading Heatmap...
+    </div>
+  ),
+});
+
 const stats = [
   {
     label: "Total Plastic Collected",
@@ -218,6 +227,19 @@ export default function AdminDashboard() {
             );
           })}
         </div>
+
+        {/* Statewide Waste Accumulation Card */}
+        <Card className="rounded-2xl border border-purple-100/80 shadow-md shadow-purple-100/40 overflow-hidden bg-white">
+          <CardHeader className="border-b border-purple-50 p-5 shrink-0 bg-gradient-to-r from-white to-purple-50/50">
+            <CardTitle className="text-base font-bold text-zinc-900">Statewide Waste Accumulation</CardTitle>
+            <p className="text-[11px] font-medium text-zinc-400 mt-0.5">
+              Live regional density mapping of accumulated plastic waste across Chhattisgarh
+            </p>
+          </CardHeader>
+          <CardContent className="p-0">
+            <AdminHeatmap />
+          </CardContent>
+        </Card>
 
         {/* ── Main 3-col grid ── */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
