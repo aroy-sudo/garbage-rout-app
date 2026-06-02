@@ -100,10 +100,16 @@ export async function POST(req: Request) {
 
     const data = await response.json();
 
+    const summary = data.features?.[0]?.properties?.summary || { distance: 0, duration: 0 };
+    const geometry = data.features?.[0]?.geometry?.coordinates || [];
+
     // Spread the ORS response GeoJSON to maintain full backward compatibility,
     // while attaching the clusteredNodes for the routing visual display.
     return NextResponse.json({
       ...data,
+      geometry,
+      distance: summary.distance,
+      duration: summary.duration,
       clusteredNodes,
     });
   } catch (error) {

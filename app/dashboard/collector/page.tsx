@@ -8,6 +8,9 @@ import { Leaf } from "lucide-react";
 import Link from "next/link";
 import CollectorAnalytics from "@/src/components/CollectorAnalytics";
 import FAQSection from "@/src/components/FAQSection";
+import { useState } from "react";
+import PhotoProofCapture from "@/src/components/ui/PhotoProofCapture";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Safely import the map for the client side only
 const CollectorMap = dynamic(() => import("@/src/components/CollectorMap"), {
@@ -16,6 +19,8 @@ const CollectorMap = dynamic(() => import("@/src/components/CollectorMap"), {
 });
 
 export default function CollectorDashboard() {
+  const [proofUrl, setProofUrl] = useState<string | null>(null);
+
   return (
     <div className="relative flex min-h-screen flex-col bg-zinc-50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
       {/* Header/Nav */}
@@ -55,13 +60,40 @@ export default function CollectorDashboard() {
           </p>
         </div>
         
-        <div className="grid gap-8">
-          <div className="rounded-2xl bg-white shadow-xl shadow-emerald-900/10 dark:bg-zinc-900 w-full col-span-1 overflow-hidden">
-             <div className="p-6">
-               <CollectorAnalytics />
-             </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          <div className="lg:col-span-2 rounded-2xl bg-white shadow-xl shadow-emerald-900/10 dark:bg-zinc-900 overflow-hidden border border-emerald-100 dark:border-emerald-900/30">
+            <div className="p-6 h-full flex flex-col justify-center">
+              <CollectorAnalytics />
+            </div>
           </div>
           
+          <Card className="rounded-2xl shadow-xl shadow-emerald-900/10 dark:bg-zinc-900 overflow-hidden border border-emerald-100 dark:border-emerald-900/30 bg-white">
+            <CardHeader className="bg-emerald-50/50 border-b border-emerald-100/50 dark:bg-emerald-900/10 dark:border-emerald-900/30">
+              <CardTitle className="text-emerald-900 dark:text-emerald-400 font-bold">Current Pickup</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 space-y-4">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-2">Capture photo proof for EPR compliance at the current pickup location.</p>
+              <PhotoProofCapture onUploadComplete={(url) => setProofUrl(url)} />
+              
+              {proofUrl && (
+                <div className="mt-4 p-4 rounded-xl bg-emerald-50 border border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-900/40 flex items-center gap-4">
+                  <div className="flex-1">
+                    <p className="font-semibold text-emerald-800 dark:text-emerald-400 flex items-center gap-2">
+                      ✅ EPR Proof Captured
+                    </p>
+                    <p className="text-xs text-emerald-600 dark:text-emerald-500 mt-1 truncate">Verified & uploaded to chain</p>
+                  </div>
+                  <div className="w-16 h-16 rounded-lg overflow-hidden border-2 border-emerald-200 shrink-0">
+                    <img src={proofUrl} alt="EPR Proof Thumbnail" className="w-full h-full object-cover" />
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid gap-8">
+          {/* Collector Analytics moved to top row */}
           <div className="h-[600px] w-full rounded-2xl border border-emerald-100 bg-white shadow-xl shadow-emerald-900/10 overflow-hidden dark:border-emerald-900/30 dark:bg-zinc-900">
              <CollectorMap />
           </div>

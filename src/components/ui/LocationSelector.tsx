@@ -27,6 +27,8 @@ interface LocationSelectorProps {
     blockId?: number;
     panchayatId?: number;
     villageId?: number;
+    lat?: number;
+    lng?: number;
   }) => void;
   className?: string;
 }
@@ -75,7 +77,13 @@ export default function LocationSelector({
     setPanchayats([]);
     setVillages([]);
 
-    onChange({ districtId });
+    const districtObj = districts.find((d) => d.id === districtId);
+
+    onChange({
+      districtId,
+      lat: districtObj?.lat ?? undefined,
+      lng: districtObj?.lng ?? undefined,
+    });
 
     setLoadingType("blocks");
     startTransition(async () => {
@@ -100,9 +108,15 @@ export default function LocationSelector({
     setPanchayats([]);
     setVillages([]);
 
+    const blockObj = blocks.find((b) => b.id === blockId);
+    const districtId = parseInt(selectedDistrict, 10);
+    const districtObj = districts.find((d) => d.id === districtId);
+
     onChange({
-      districtId: parseInt(selectedDistrict, 10),
+      districtId,
       blockId,
+      lat: blockObj?.lat ?? districtObj?.lat ?? undefined,
+      lng: blockObj?.lng ?? districtObj?.lng ?? undefined,
     });
 
     setLoadingType("panchayats");
@@ -126,10 +140,18 @@ export default function LocationSelector({
     setSelectedVillage("");
     setVillages([]);
 
+    const panchayatObj = panchayats.find((p) => p.id === panchayatId);
+    const districtId = parseInt(selectedDistrict, 10);
+    const blockId = parseInt(selectedBlock, 10);
+    const blockObj = blocks.find((b) => b.id === blockId);
+    const districtObj = districts.find((d) => d.id === districtId);
+
     onChange({
-      districtId: parseInt(selectedDistrict, 10),
-      blockId: parseInt(selectedBlock, 10),
+      districtId,
+      blockId,
       panchayatId,
+      lat: panchayatObj?.lat ?? blockObj?.lat ?? districtObj?.lat ?? undefined,
+      lng: panchayatObj?.lng ?? blockObj?.lng ?? districtObj?.lng ?? undefined,
     });
 
     setLoadingType("villages");
@@ -149,11 +171,21 @@ export default function LocationSelector({
     const villageId = parseInt(val, 10);
     setSelectedVillage(val);
 
+    const villageObj = villages.find((v) => v.id === villageId);
+    const districtId = parseInt(selectedDistrict, 10);
+    const blockId = parseInt(selectedBlock, 10);
+    const blockObj = blocks.find((b) => b.id === blockId);
+    const panchayatId = parseInt(selectedPanchayat, 10);
+    const panchayatObj = panchayats.find((p) => p.id === panchayatId);
+    const districtObj = districts.find((d) => d.id === districtId);
+
     onChange({
-      districtId: parseInt(selectedDistrict, 10),
-      blockId: parseInt(selectedBlock, 10),
-      panchayatId: parseInt(selectedPanchayat, 10),
+      districtId,
+      blockId,
+      panchayatId,
       villageId,
+      lat: villageObj?.lat ?? panchayatObj?.lat ?? blockObj?.lat ?? districtObj?.lat ?? undefined,
+      lng: villageObj?.lng ?? panchayatObj?.lng ?? blockObj?.lng ?? districtObj?.lng ?? undefined,
     });
   };
 

@@ -12,6 +12,7 @@ import L from "leaflet";
 import ZoneRoutingLayer from "./ZoneRoutingLayer";
 import { useDriverTracking } from "@/src/hooks/useDriverTracking";
 import { isWithinRadius } from "@/src/utils/geofencing";
+import { TelemetryCard } from "./ui/TelemetryCard";
 
 type PickupRequest = {
   id: string;
@@ -37,8 +38,8 @@ const MAP_CENTER: [number, number] = [21.2497, 81.6050];
 const fetchORSRoute = async (
   pickupRequests: PickupRequest[],
   depotLocation: [number, number]
-): Promise<[number, number][]> => {
-  if (pickupRequests.length === 0) return [];
+): Promise<{ routeGeometry: [number, number][], routeSummary: { distance: number, duration: number }, pickupNodes: any[] }> => {
+  if (pickupRequests.length === 0) return { routeGeometry: [], routeSummary: { distance: 0, duration: 0 }, pickupNodes: [] };
 
   const apiKey = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImZlOWI2NWI3MTgxZTRiNGY5YTkzMWY2YThlMDlkMzk1IiwiaCI6Im11cm11cjY0In0=";
   if (!apiKey) {
@@ -67,13 +68,18 @@ const fetchORSRoute = async (
     }
 
     const data = await response.json();
-    const geometry = data.features?.[0]?.geometry?.coordinates;
+    const geometry = data.geometry || data.features?.[0]?.geometry?.coordinates;
+    const summary = data.features?.[0]?.properties?.summary || { distance: 0, duration: 0 };
 
     if (!geometry) {
       throw new Error("ORS returned empty route");
     }
 
-    return geometry.map(([lng, lat]: [number, number]) => [lat, lng]);
+    return {
+      routeGeometry: geometry.map(([lng, lat]: [number, number]) => [lat, lng]),
+      routeSummary: { distance: data.distance || summary.distance || 0, duration: data.duration || summary.duration || 0 },
+      pickupNodes: data.clusteredNodes || [],
+    };
   } catch (error) {
     console.error("Fetch to ORS proxy failed.", error);
     throw error;
@@ -84,7 +90,11 @@ const CollectorMap = () => {
   const supabase = createClient();
 
   const [pickupRequests, setPickupRequests] = useState<PickupRequest[]>([]);
-  const [routePath, setRoutePath] = useState<[number, number][]>([]);
+  const [routeData, setRouteData] = useState<{
+    routeGeometry: [number, number][];
+    routeSummary: { distance: number; duration: number };
+    pickupNodes: any[];
+  } | null>(null);
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [quotaExceeded, setQuotaExceeded] = useState(false);
 
@@ -137,12 +147,12 @@ const CollectorMap = () => {
 
   // ORS ROUTE LOGIC
   const getOptimizedRoute = useCallback(async () => {
-    if (pickupRequests.length === 0 || quotaExceeded) return [];
+    if (pickupRequests.length === 0 || quotaExceeded) return null;
 
     try {
-      const route = await fetchORSRoute(pickupRequests, depotLocation);
+      const data = await fetchORSRoute(pickupRequests, depotLocation);
       toast.success("Route generated using OpenRouteService");
-      return route;
+      return data;
     } catch (error) {
       console.error("Route fetch failed", error);
       const errorMessage = error instanceof Error ? error.message : "Failed to fetch route from ORS";
@@ -154,20 +164,20 @@ const CollectorMap = () => {
         toast.error(errorMessage);
       }
 
-      return [];
+      return null;
     }
   }, [pickupRequests, depotLocation, quotaExceeded]);
 
   // UPDATE ROUTE
   const updateRoute = useCallback(async () => {
     if (pickupRequests.length === 0) {
-      setRoutePath([]);
+      setRouteData(null);
       return;
     }
 
     setLoadingRoute(true);
-    const path = await getOptimizedRoute();
-    setRoutePath(path);
+    const data = await getOptimizedRoute();
+    setRouteData(data);
     setLoadingRoute(false);
   }, [pickupRequests, getOptimizedRoute]);
 
@@ -287,8 +297,8 @@ const CollectorMap = () => {
         className="h-full w-full min-h-[500px] z-0"
       >
         <OfflineTileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution="&copy; OpenStreetMap contributors"
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
 
         {/* ─── 4-Zone routing grid ─────────────────────────────────── */}
@@ -314,19 +324,49 @@ const CollectorMap = () => {
         </div>
 
         {/* ROUTE */}
-        {routePath.length > 0 && (
+        {routeData && routeData.routeGeometry.length > 0 && (
           <Polyline
-            positions={routePath}
+            positions={routeData.routeGeometry}
             pathOptions={{
-              color: "#059669",
+              color: "#8b5cf6",
               weight: 6,
-              opacity: 0.9,
+              opacity: 0.8,
+              dashArray: "10, 10"
             }}
           />
         )}
 
+        {/* CLUSTERED PICKUP NODES */}
+        {routeData?.pickupNodes?.map((node: any, idx: number) => (
+          <Marker
+            key={node.id || idx}
+            position={[node.latitude, node.longitude]}
+            icon={L.divIcon({
+              className: "custom-cluster-marker",
+              html: `<div style="display:flex; align-items:center; justify-content:center; width:32px; height:32px; background-color:#22c55e; color:white; border-radius:50%; border:2px solid white; font-weight:bold; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);">${node.weight || 1}</div>`,
+              iconSize: [32, 32],
+              iconAnchor: [16, 16],
+            })}
+          >
+            <Popup>
+              <strong>Clustered Pickups</strong>
+              <br />
+              Total Weight: {node.weight}kg
+            </Popup>
+          </Marker>
+        ))}
+
+        {/* TELEMETRY OVERLAY */}
+        {routeData && routeData.routeSummary && (
+          <TelemetryCard
+            distanceMeters={routeData.routeSummary.distance}
+            durationSeconds={routeData.routeSummary.duration}
+            nodeCount={routeData.pickupNodes.length}
+          />
+        )}
+
         {/* LOADING MARKER */}
-        {loadingRoute && !routePath.length && (
+        {loadingRoute && (!routeData || routeData.routeGeometry.length === 0) && (
           <Marker position={mapCenter}>
             <Popup>Computing optimal route...</Popup>
           </Marker>

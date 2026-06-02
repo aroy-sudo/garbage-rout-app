@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import MovingTruck from './MovingTruck';
 import { GeoPoint, SHGS, RECYCLERS } from '@/src/lib/demoData';
 import ZoneRoutingLayer from './ZoneRoutingLayer';
+import MapUpdater from './MapUpdater';
 
 
 // Leaflet's default icon doesn't work well with React, so we need to fix it.
@@ -45,7 +46,11 @@ type PickupRequest = {
   created_at: string;
 };
 
-const ResidentMap = () => {
+interface ResidentMapProps {
+  center?: [number, number] | null;
+}
+
+const ResidentMap = ({ center }: ResidentMapProps) => {
   const supabase = createClient();
   const [activePickups, setActivePickups] = useState<GeoPoint[]>([]);
   const [dummyTrucks, setDummyTrucks] = useState<DummyTruck[]>([]);
@@ -230,9 +235,10 @@ const ResidentMap = () => {
 
       <MapContainer center={mapCenter} zoom={mapZoom} className="h-full w-full min-h-[500px] z-0">
         <OfflineTileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
+        <MapUpdater center={center} />
 
         {/* ─── 4-Zone grid (resident view, no routing lines) ─── */}
         <ZoneRoutingLayer livePickups={activePickups} showRoutes={false} />

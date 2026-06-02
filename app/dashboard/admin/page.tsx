@@ -236,7 +236,7 @@ export default function AdminDashboard() {
               Live regional density mapping of accumulated plastic waste across Chhattisgarh
             </p>
           </CardHeader>
-          <CardContent className="p-0">
+          <CardContent className="p-0 h-[500px] w-full relative">
             <AdminHeatmap />
           </CardContent>
         </Card>

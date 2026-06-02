@@ -10,6 +10,11 @@ import { Leaf } from "lucide-react";
 import Link from "next/link";
 import PaymentPopup from "@/src/components/PaymentPopup";
 import FAQSection from "@/src/components/FAQSection";
+import { useState } from "react";
+import LocationSelector from "@/src/components/ui/LocationSelector";
+import VoiceWeightInput from "@/src/components/ui/VoiceWeightInput";
+import PRWalletCard from "@/src/components/PRWalletCard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Safely import the Leaflet map for the client side only
 const ResidentMap = dynamic(() => import("@/src/components/ResidentMap"), {
@@ -18,6 +23,17 @@ const ResidentMap = dynamic(() => import("@/src/components/ResidentMap"), {
 });
 
 export default function ResidentDashboard() {
+  const [weight, setWeight] = useState<number>(0);
+  const [location, setLocation] = useState<{
+    districtId?: number;
+    blockId?: number;
+    panchayatId?: number;
+    villageId?: number;
+    lat?: number;
+    lng?: number;
+  } | null>(null);
+  const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
+
   return (
     <div className="relative flex min-h-screen flex-col bg-zinc-50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
       {/* Header/Nav */}
@@ -57,15 +73,46 @@ export default function ResidentDashboard() {
           </p>
         </div>
 
-        <div className="grid gap-8">
+        <div className="mb-8">
+          <PRWalletCard />
+        </div>
+
+        <div className="grid gap-8 md:grid-cols-2 mb-8">
+          {/* Schedule Pickup Section */}
+          <Card className="rounded-2xl border border-[#e8fccf] shadow-xl shadow-[#134611]/10 dark:border-[#134611]/30 dark:bg-zinc-900 overflow-hidden bg-white">
+            <CardHeader className="bg-[#e8fccf]/30 border-b border-[#e8fccf]/50 dark:bg-[#134611]/10 dark:border-[#134611]/30">
+              <CardTitle className="text-[#134611] dark:text-[#96e072] font-bold">Schedule Pickup</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 space-y-6">
+              <LocationSelector
+                onChange={(loc) => {
+                  setLocation(loc);
+                  if (loc.lat !== undefined && loc.lng !== undefined) {
+                    setMapCenter([loc.lat, loc.lng]);
+                  }
+                }}
+              />
+              <VoiceWeightInput onWeightExtracted={(w) => setWeight(w)} />
+              <div className="mt-4 p-4 rounded-xl bg-[#e8fccf]/30 border border-[#e8fccf] dark:bg-[#134611]/20 dark:border-[#134611]/40 flex items-center justify-center">
+                <p className="font-semibold text-[#134611] dark:text-[#96e072] flex items-center gap-2">
+                  <Leaf className="w-5 h-5" /> Current Logged Weight: {weight || 0} kg
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          
           {/* Analytics Dashboard */}
-          <div className="rounded-2xl border border-[#e8fccf] bg-white p-6 shadow-xl shadow-[#134611]/10 dark:border-[#134611]/30 dark:bg-zinc-900">
+          <div className="rounded-2xl border border-[#e8fccf] bg-white p-6 shadow-xl shadow-[#134611]/10 dark:border-[#134611]/30 dark:bg-zinc-900 h-full flex flex-col justify-center">
             <AnalyticsDashboard />
           </div>
+        </div>
+
+        <div className="grid gap-8">
+          {/* Removed old Analytics position as it's now alongside Schedule Pickup */}
           
           {/* Map Container */}
           <div className="h-[600px] w-full rounded-2xl border border-[#e8fccf] bg-white shadow-xl shadow-[#134611]/10 overflow-hidden dark:border-[#134611]/30 dark:bg-zinc-900">
-            <ResidentMap />
+            <ResidentMap center={mapCenter} />
           </div>
 
           {/* Pickup Status Table */}
