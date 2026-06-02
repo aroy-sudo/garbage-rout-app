@@ -27,15 +27,16 @@ const MovingTruck = ({ position }: MovingTruckProps) => {
 
 
   const currentPosition = position;
+  if (!currentPosition || !currentPosition[0] || !currentPosition[1] || isNaN(currentPosition[0]) || isNaN(currentPosition[1])) {
+    return null;
+  }
 
   return (
-    currentPosition ? (
-      <Marker position={currentPosition} icon={truckIcon}>
-        <Popup>
-          <strong>🚛 Active Collector Live GPS</strong>
-        </Popup>
-      </Marker>
-    ) : null
+    <Marker position={currentPosition} icon={truckIcon}>
+      <Popup>
+        <strong>🚛 Active Collector Live GPS</strong>
+      </Popup>
+    </Marker>
   );
 };
 

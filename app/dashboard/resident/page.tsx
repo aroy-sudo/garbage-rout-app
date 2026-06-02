@@ -53,7 +53,7 @@ export default function ResidentDashboard() {
     if (res.error) {
       toast.error(res.error);
     } else {
-      toast.success(res.message);
+      toast.success("✅ Pickup scheduled successfully!");
       setSubmittedPickup({ lat: location.lat, lng: location.lng });
       setWeight(0);
       setLocation(null);
@@ -143,8 +143,14 @@ export default function ResidentDashboard() {
                 onClick={handleSubmit} 
                 disabled={weight === 0 || !location?.lat || isSubmitting}
               >
-                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
-                Submit Pickup Request
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Scheduling...
+                  </>
+                ) : (
+                  "Submit Pickup Request"
+                )}
               </Button>
             </CardContent>
           </Card>

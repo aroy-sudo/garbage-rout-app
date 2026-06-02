@@ -4,7 +4,7 @@ import { logOut } from "../actions";
 import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
 import PickupStatusTable from "@/src/components/PickupStatusTable";
-import { Leaf, CheckCircle2 } from "lucide-react";
+import { Leaf, CheckCircle2, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import CollectorAnalytics from "@/src/components/CollectorAnalytics";
 import FAQSection from "@/src/components/FAQSection";
@@ -75,7 +75,7 @@ export default function CollectorDashboard() {
         </div>
       </header>
 
-      <main className="flex-1 relative z-10 container mx-auto px-4 py-12 sm:px-6 lg:px-8">
+      <main className="flex-1 relative z-10 container mx-auto px-4 py-12 pb-20 sm:px-6 lg:px-8">
         <div className="mb-10">
           <h1 className="text-4xl font-extrabold tracking-tight text-emerald-900 dark:text-emerald-400 mb-2">
             Collector Dashboard
@@ -113,18 +113,32 @@ export default function CollectorDashboard() {
               </TabsList>
               
               <TabsContent value="pending" className="space-y-4">
-                {pendingPickups.map(pickup => (
-                  <Card key={pickup.id} className="cursor-pointer hover:border-emerald-500 transition-colors" onClick={() => { setSelectedPickup(pickup); setIsSheetOpen(true); }}>
-                    <CardContent className="p-4 flex items-center justify-between">
-                      <div>
-                        <p className="font-semibold text-emerald-900 dark:text-emerald-400">{pickup.location_name || `Pickup #${pickup.id}`}</p>
-                        <p className="text-sm text-zinc-500">{pickup.weight || pickup.weight_kg || 0} kg</p>
-                      </div>
-                      <Button variant="outline" size="sm">Process</Button>
-                    </CardContent>
-                  </Card>
-                ))}
-                {pendingPickups.length === 0 && <p className="text-zinc-500">No pending pickups.</p>}
+                {pendingPickups.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center p-8 text-center rounded-xl border border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/50 min-h-[180px]">
+                    <CheckCircle className="h-10 w-10 text-emerald-600 dark:text-emerald-400 mb-3 animate-bounce" />
+                    <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-300">All blocks are clear.</p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">No pending waste collections.</p>
+                  </div>
+                ) : (
+                  pendingPickups.map(pickup => (
+                    <Card key={pickup.id} className="cursor-pointer hover:border-emerald-500 transition-colors" onClick={() => { setSelectedPickup(pickup); setIsSheetOpen(true); }}>
+                      <CardContent className="p-4 flex items-center justify-between">
+                        <div>
+                          <p className="font-semibold text-emerald-900 dark:text-emerald-400">{pickup.location_name || `Pickup #${pickup.id}`}</p>
+                          <p className="text-sm text-zinc-500">
+                            {(
+                              (pickup.pet_weight || 0) +
+                              (pickup.hdpe_weight || 0) +
+                              (pickup.ldpe_weight || 0) +
+                              (pickup.pp_weight || 0)
+                            ).toFixed(1)} kg
+                          </p>
+                        </div>
+                        <Button variant="outline" size="sm">Process</Button>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
               </TabsContent>
 
               <TabsContent value="completed" className="space-y-4">
@@ -133,7 +147,14 @@ export default function CollectorDashboard() {
                     <CardContent className="p-4 flex items-center justify-between">
                       <div>
                         <p className="font-semibold text-emerald-900 dark:text-emerald-400">{pickup.location_name || `Pickup #${pickup.id}`}</p>
-                        <p className="text-sm text-emerald-700">{pickup.weight || pickup.weight_kg || 0} kg Final Weight</p>
+                        <p className="text-sm text-emerald-700">
+                          {(
+                            (pickup.pet_weight || 0) +
+                            (pickup.hdpe_weight || 0) +
+                            (pickup.ldpe_weight || 0) +
+                            (pickup.pp_weight || 0)
+                          ).toFixed(1)} kg Final Weight
+                        </p>
                       </div>
                       <CheckCircle2 className="text-emerald-500 w-6 h-6" />
                     </CardContent>

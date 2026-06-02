@@ -17,7 +17,10 @@ export async function completePickupTransaction(pickupId: string | number, final
     .from("pickup_requests")
     .update({
       status: 'completed',
-      weight_kg: finalWeight,
+      pet_weight: finalWeight,
+      hdpe_weight: 0,
+      ldpe_weight: 0,
+      pp_weight: 0,
       proof_url: proofUrl,
       collected_at: new Date().toISOString()
     })

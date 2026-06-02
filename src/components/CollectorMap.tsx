@@ -342,25 +342,30 @@ const CollectorMap = ({ pickupNodes, onMarkerClick }: CollectorMapProps = {}) =>
         )}
 
         {/* CLUSTERED PICKUP NODES */}
-        {routeData?.pickupNodes?.map((node: any, idx: number) => (
-          <Marker
-            key={node.id || idx}
-            position={[node.latitude, node.longitude]}
-            icon={L.divIcon({
-              className: "custom-cluster-marker",
-              html: `<div style="display:flex; align-items:center; justify-content:center; width:32px; height:32px; background-color:#22c55e; color:white; border-radius:50%; border:2px solid white; font-weight:bold; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);">${node.weight || 1}</div>`,
-              iconSize: [32, 32],
-              iconAnchor: [16, 16],
-            })}
-            eventHandlers={{ click: () => onMarkerClick?.(node) }}
-          >
-            <Popup>
-              <strong>Clustered Pickups</strong>
-              <br />
-              Total Weight: {node.weight}kg
-            </Popup>
-          </Marker>
-        ))}
+        {routeData?.pickupNodes?.map((node: any, idx: number) => {
+          const lat = node.latitude;
+          const lng = node.longitude;
+          if (!lat || !lng || isNaN(lat) || isNaN(lng)) return null;
+          return (
+            <Marker
+              key={node.id || idx}
+              position={[lat, lng]}
+              icon={L.divIcon({
+                className: "custom-cluster-marker",
+                html: `<div style="display:flex; align-items:center; justify-content:center; width:32px; height:32px; background-color:#22c55e; color:white; border-radius:50%; border:2px solid white; font-weight:bold; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);">${node.weight || 1}</div>`,
+                iconSize: [32, 32],
+                iconAnchor: [16, 16],
+              })}
+              eventHandlers={{ click: () => onMarkerClick?.(node) }}
+            >
+              <Popup>
+                <strong>Clustered Pickups</strong>
+                <br />
+                Total Weight: {node.weight}kg
+              </Popup>
+            </Marker>
+          );
+        })}
 
         {/* TELEMETRY OVERLAY */}
         {routeData && routeData.routeSummary && (
@@ -373,20 +378,30 @@ const CollectorMap = ({ pickupNodes, onMarkerClick }: CollectorMapProps = {}) =>
         )}
 
         {/* LOADING MARKER */}
-        {loadingRoute && (!routeData || routeData.routeGeometry.length === 0) && (
-          <Marker position={mapCenter}>
-            <Popup>Computing optimal route...</Popup>
-          </Marker>
-        )}
+        {loadingRoute && (!routeData || routeData.routeGeometry.length === 0) && (() => {
+          const lat = mapCenter[0];
+          const lng = mapCenter[1];
+          if (!lat || !lng || isNaN(lat) || isNaN(lng)) return null;
+          return (
+            <Marker position={[lat, lng]}>
+              <Popup>Computing optimal route...</Popup>
+            </Marker>
+          );
+        })()}
 
         {/* DRIVER MARKER */}
-        {currentLatLng && (
-          <Marker position={currentLatLng}>
-            <Popup>
-              <strong>🚛 Driver Live GPS</strong>
-            </Popup>
-          </Marker>
-        )}
+        {currentLatLng && (() => {
+          const lat = currentLatLng[0];
+          const lng = currentLatLng[1];
+          if (!lat || !lng || isNaN(lat) || isNaN(lng)) return null;
+          return (
+            <Marker position={[lat, lng]}>
+              <Popup>
+                <strong>🚛 Driver Live GPS</strong>
+              </Popup>
+            </Marker>
+          );
+        })()}
 
         <MovingTruck position={currentLatLng || FALLBACK_LOCATION} />
       </MapContainer>

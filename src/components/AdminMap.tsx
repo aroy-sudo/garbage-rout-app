@@ -117,7 +117,7 @@ export default function AdminMap() {
     <div className="w-full h-full relative overflow-hidden">
 
       {/* Floating Region Details overlay */}
-      <div className="absolute bottom-4 left-4 z-[1000] bg-white/95 backdrop-blur-md p-4 rounded-xl shadow-xl border border-zinc-200/50 min-w-[220px]">
+      <div className="absolute bottom-4 left-4 z-[1000] bg-white/85 backdrop-blur-md p-4 rounded-xl shadow-xl border border-white/20 min-w-[220px]">
         <h4 className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase mb-3">Critical Zone</h4>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between items-center bg-zinc-50 px-2 py-1.5 rounded-md">
@@ -184,28 +184,38 @@ export default function AdminMap() {
         ))}
 
         {/* SHG red-dot markers */}
-        {SHGS.map((shg) => (
-          <Marker key={shg.id} position={[shg.lat, shg.lng]} icon={SHGIcon}>
-            <Popup className="font-sans">
-              <div className="text-sm">
-                <p className="font-bold text-zinc-900 mb-1">📍 SHG Collection Point</p>
-                <p className="text-zinc-500 text-xs font-mono">{shg.id}</p>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        {SHGS.map((shg) => {
+          const lat = shg.lat;
+          const lng = shg.lng;
+          if (!lat || !lng || isNaN(lat) || isNaN(lng)) return null;
+          return (
+            <Marker key={shg.id} position={[lat, lng]} icon={SHGIcon}>
+              <Popup className="font-sans">
+                <div className="text-sm">
+                  <p className="font-bold text-zinc-900 mb-1">📍 SHG Collection Point</p>
+                  <p className="text-zinc-500 text-xs font-mono">{shg.id}</p>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
 
         {/* Recycler station markers */}
-        {RECYCLERS.map((recycler) => (
-          <Marker key={recycler.id} position={[recycler.lat, recycler.lng]} icon={RecyclerIcon}>
-            <Popup className="font-sans">
-              <div className="text-sm">
-                <p className="font-bold text-green-800 mb-1">♻️ Waste Recycler Station</p>
-                <p className="text-zinc-500 text-xs font-mono">{recycler.id}</p>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        {RECYCLERS.map((recycler) => {
+          const lat = recycler.lat;
+          const lng = recycler.lng;
+          if (!lat || !lng || isNaN(lat) || isNaN(lng)) return null;
+          return (
+            <Marker key={recycler.id} position={[lat, lng]} icon={RecyclerIcon}>
+              <Popup className="font-sans">
+                <div className="text-sm">
+                  <p className="font-bold text-green-800 mb-1">♻️ Waste Recycler Station</p>
+                  <p className="text-zinc-500 text-xs font-mono">{recycler.id}</p>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
 
       </MapContainer>
     </div>

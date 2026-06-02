@@ -15,7 +15,10 @@ export async function submitPickupRequest(data: { weight_kg: number, lat: number
   const { error } = await supabase.from("pickup_requests").insert([
     {
       user_id,
-      weight_kg: data.weight_kg,
+      pet_weight: data.weight_kg,
+      hdpe_weight: 0,
+      ldpe_weight: 0,
+      pp_weight: 0,
       latitude: data.lat,
       longitude: data.lng,
       village_id: data.village_id,

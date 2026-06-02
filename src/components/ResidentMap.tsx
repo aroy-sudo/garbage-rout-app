@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
-import { MapContainer } from 'react-leaflet';
+import { MapContainer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import OfflineTileLayer from './OfflineTileLayer';
 import { createClient } from '@/src/utils/supabase/client';
@@ -213,7 +213,7 @@ const ResidentMap = ({ center, pendingPickup }: ResidentMapProps) => {
     <div className="w-full h-full flex flex-col relative">
       {/* Floating Request Pickup Box */}
       <div className="absolute top-4 right-4 z-[1000] w-72">
-        <div className="bg-white/95 backdrop-blur-md border border-[#e8fccf] shadow-xl shadow-[#134611]/10 rounded-2xl p-4 flex flex-col gap-3">
+        <div className="bg-white/85 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-4 flex flex-col gap-3">
           <div className="flex items-start gap-3">
             <div className="p-2 bg-[#e8fccf] text-[#3e8914] rounded-lg mt-0.5">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm40-88a8,8,0,0,1-8,8H136v24a8,8,0,0,1-16,0V136H96a8,8,0,0,1,0-16h24V96a8,8,0,0,1,16,0v24h24A8,8,0,0,1,168,128Z"></path></svg>
@@ -248,19 +248,25 @@ const ResidentMap = ({ center, pendingPickup }: ResidentMapProps) => {
         {/* Now handled by ZoneRoutingLayer Drop-Pins! */}
 
         {/* User's newly submitted pickup */}
-        {pendingPickup && (
-          <Marker 
-            position={[pendingPickup.lat, pendingPickup.lng]}
-            icon={L.divIcon({
-              className: "custom-pulsing-marker",
-              html: `<div style="display:flex; align-items:center; justify-content:center; width:24px; height:24px; background-color:#22c55e; border-radius:50%; border:3px solid white; box-shadow: 0 0 10px rgba(34,197,94,0.8); animation: pulse 2s infinite;"></div>`,
-              iconSize: [24, 24],
-              iconAnchor: [12, 12],
-            })}
-          >
-            <Popup>Your scheduled pickup location</Popup>
-          </Marker>
-        )}
+        {(() => {
+          if (!pendingPickup) return null;
+          const lat = pendingPickup.lat;
+          const lng = pendingPickup.lng;
+          if (!lat || !lng || isNaN(lat) || isNaN(lng)) return null;
+          return (
+            <Marker 
+              position={[lat, lng]}
+              icon={L.divIcon({
+                className: "custom-pulsing-marker",
+                html: `<div style="display:flex; align-items:center; justify-content:center; width:24px; height:24px; background-color:#22c55e; border-radius:50%; border:3px solid white; box-shadow: 0 0 10px rgba(34,197,94,0.8); animation: pulse 2s infinite;"></div>`,
+                iconSize: [24, 24],
+                iconAnchor: [12, 12],
+              })}
+            >
+              <Popup>Your scheduled pickup location</Popup>
+            </Marker>
+          );
+        })()}
 
         {/* Render Animated Dummy Collector Trucks */}
         {dummyTrucks.map(truck => (

@@ -1,0 +1,36 @@
+{
+  "name": "EcoRoute Pilot",
+  "short_name": "EcoRoute",
+  "description": "Real-time, AI-optimized rural logistics platform for Chhattisgarh Extended Producer Responsibility (EPR) pilot launch.",
+  "start_url": "/login",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#166534",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

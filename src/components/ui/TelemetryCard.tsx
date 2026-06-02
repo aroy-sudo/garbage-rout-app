@@ -46,7 +46,7 @@ export function TelemetryCard({
   };
 
   return (
-    <Card className="absolute top-4 right-4 z-[1000] bg-white/90 backdrop-blur shadow-lg min-w-[200px]">
+    <Card className="absolute top-4 right-4 z-[1000] bg-white/85 backdrop-blur-md border border-white/20 shadow-xl min-w-[200px]">
       <CardContent className="p-4 space-y-4">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-blue-100 rounded-full">

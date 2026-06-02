@@ -269,13 +269,17 @@ export default function ExecutiveHeatmap() {
 
               {/* Render circular density markers */}
               {filteredPoints.map((pt) => {
+                const lat = pt.latitude;
+                const lng = pt.longitude;
+                if (!lat || !lng || isNaN(lat) || isNaN(lng)) return null;
+
                 const color = getMarkerColor(pt.totalWeight);
                 const radius = getMarkerRadius(pt.totalWeight);
 
                 return (
                   <CircleMarker
                     key={pt.id}
-                    center={[pt.latitude, pt.longitude]}
+                    center={[lat, lng]}
                     radius={radius}
                     fillColor={color}
                     color="#ffffff"
@@ -326,7 +330,7 @@ export default function ExecutiveHeatmap() {
             </MapContainer>
 
             {/* Density Scale Legend overlay inside the map container */}
-            <div className="absolute bottom-4 left-4 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-sm p-3 rounded-xl shadow-lg border border-zinc-200/50 dark:border-zinc-800/80 z-[1000] flex flex-col gap-2 text-xs">
+            <div className="absolute bottom-4 left-4 bg-white/85 dark:bg-zinc-950/85 backdrop-blur-md p-3 rounded-xl shadow-xl border border-white/20 dark:border-white/10 z-[1000] flex flex-col gap-2 text-xs">
               <span className="font-bold text-zinc-800 dark:text-zinc-100">Density Scale</span>
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center gap-2">

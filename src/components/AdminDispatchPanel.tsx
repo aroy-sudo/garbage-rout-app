@@ -20,7 +20,7 @@ export function AdminDispatchPanel() {
       const result = await autoDispatchRoutes(capacity, dummyDrivers);
       
       if (result.success) {
-        toast.success(result.message || `Successfully generated ${result.routesGenerated} routes!`);
+        toast.success("✅ Routes optimized and dispatched to drivers.");
       } else {
         toast.error(result.message || "Failed to dispatch routes.");
       }
@@ -33,8 +33,8 @@ export function AdminDispatchPanel() {
   };
 
   return (
-    <Card className="shadow-lg border-blue-100 bg-white">
-      <CardHeader className="bg-blue-50/50 border-b border-blue-100">
+    <Card className="bg-white/85 backdrop-blur-md border border-white/20 shadow-xl">
+      <CardHeader className="bg-blue-50/20 border-b border-white/10">
         <div className="flex items-center gap-2">
           <Truck className="h-6 w-6 text-blue-600" />
           <CardTitle className="text-xl font-bold text-blue-900">Route Dispatch Engine</CardTitle>
@@ -62,8 +62,8 @@ export function AdminDispatchPanel() {
         >
           {isDispatching ? (
             <>
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              Dispatching Routes...
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Calculating Routes...
             </>
           ) : (
             "Run Auto-Dispatch"

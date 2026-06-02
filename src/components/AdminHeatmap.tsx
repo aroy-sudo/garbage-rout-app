@@ -49,12 +49,16 @@ export default function AdminHeatmap() {
           />
 
           {heatmapData.map((point) => {
+            const lat = point.lat;
+            const lng = point.lng;
+            if (!lat || !lng || isNaN(lat) || isNaN(lng)) return null;
+
             const style = getMarkerStyle(point.weight_kg);
 
             return (
               <CircleMarker
                 key={point.id}
-                center={[point.lat, point.lng]}
+                center={[lat, lng]}
                 radius={style.radius}
                 fillColor={style.color}
                 color="#ffffff"

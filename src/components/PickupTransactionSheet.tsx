@@ -36,7 +36,7 @@ export function PickupTransactionSheet({
       );
 
       if (result.success) {
-        toast.success(result.message || "Pickup completed!");
+        toast.success("✅ Pickup completed and logged to PR Wallet.");
         onComplete(pickup.id);
         setProofUrl(null);
         onClose();
@@ -59,7 +59,7 @@ export function PickupTransactionSheet({
 
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-xl h-[85vh] flex flex-col gap-6 overflow-y-auto">
+      <SheetContent side="bottom" className="rounded-t-xl h-[85vh] flex flex-col gap-6 overflow-y-auto pb-10">
         <SheetHeader>
           <SheetTitle className="text-2xl font-bold text-emerald-900">
             {pickup?.location_name || pickup?.id || "Unknown Location"}
@@ -89,8 +89,8 @@ export function PickupTransactionSheet({
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Processing Transaction...
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Processing...
               </>
             ) : (
               "Complete Pickup"
