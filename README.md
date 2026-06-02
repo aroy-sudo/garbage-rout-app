@@ -1,139 +1,99 @@
-# 🌿 EcoRoute: State Logistics & Waste Management Platform
-### *Empowering Rural Self-Help Groups, Enforcing EPR Compliance, and Optimizing Waste Logistics across Chhattisgarh*
+# 🌍 EcoRoute: State-Level Logistics & Rural Waste Management Engine
+
+> **An AI-optimized, offline-first routing platform designed for the Extended Producer Responsibility (EPR) framework.**
+
+**Architected and Built by Abhiraj Roy (CSE)**
 
 ---
 
-## 👨‍💻 Author Attribution
-**Built by Abhiraj Roy (CSE)**  
-*Department of Computer Science & Engineering, IT Stream*
+## 1. Executive Summary
+
+### The Operational Challenge
+Rural waste management frameworks currently operate entirely blind. Vehicles are dispatched on static schedules without any real-time data regarding actual waste accumulation at the village level. This structural inefficiency leads to massive fuel wastage, exorbitant logistical overhead for rural panchayats, and severely limits the financial compensation available to Self-Help Group (SHG) workers due to poor route density and collection volume.
+
+### The EcoRoute Solution
+EcoRoute digitizes the entire rural waste pipeline from the localized village panchayat level up to the state administrative dashboard. By shifting from reactive collection to proactive, AI-driven dispatching, EcoRoute mathematically minimizes fuel consumption while maximizing collection density. The platform bridges the digital literacy gap with accessible voice interfaces and ensures uncompromising data availability in remote zones via offline-first edge architecture.
 
 ---
 
-## 📌 Executive Summary
+## 2. System Architecture
 
-### 🛑 The Problem
-Rural waste collection in Chhattisgarh has historically been **blind, unstructured, and highly fuel-inefficient**. Local authorities lacked visibility into actual trash accumulation, leading to trucks driving long distances for minimal waste. Concurrently, rural workers (Self-Help Groups/SHGs) faced transparency gaps in payouts, while state compliance bodies struggled to verify plastic collection proofs for **Extended Producer Responsibility (EPR)** credits.
+EcoRoute is engineered on a modern, highly scalable technology stack designed to handle thousands of concurrent geographic queries and real-time state updates:
 
-### 🚀 The Solution
-**EcoRoute** is a state-of-the-art Next.js 16 Web Platform designed to streamline regional waste logistics and enforce compliance. By merging state-level **Chhattisgarh Local Government Directory (LGD)** hierarchies with spatial mathematics and automated compliance layers, EcoRoute transforms environmental management into a transparent, secure, and route-optimized system.
+- **Frontend / Edge Layer:** Built on **Next.js 16 (App Router)** and **React**. The user interface utilizes **Tailwind CSS** and **shadcn/ui** to deliver a premium, glassmorphism-inspired aesthetic. The application is configured strictly as a Progressive Web App (PWA) with aggressive edge caching for offline availability.
+- **Backend / Database Layer:** Powered by **Supabase (PostgreSQL)**. Data isolation and multi-tenant security are enforced at the database level using strict Row Level Security (RLS) policies. **Supabase Storage** securely hosts geofenced photo proofs required for EPR compliance.
+- **Spatial / Routing Engine:** Integrates **OpenRouteService (ORS)** for robust geographic pathing and turn-by-turn navigation data. Client-side spatial clustering and geographic processing are handled by **Turf.js**.
+- **AI / Voice Integration:** Utilizes the **Groq/Whisper API** pipeline to provide instantaneous, highly accurate localized voice-to-text processing for SHG workers.
 
 ---
 
-## ⚡ Key Features (The "Wow" Factor)
+## 3. Core Technical Innovations (Deep Dive)
 
-### 📡 Offline-First Architecture
-*   Fully optimized mobile PWA (Progressive Web App) capabilities.
-*   Enables field collectors to log coordinate checkpoints and storage weights even in remote regional areas with spotty network coverage.
+### 🧠 CVRP Auto-Dispatch Algorithm
+At the core of EcoRoute's logistical efficiency is its solution to the Capacitated Vehicle Routing Problem (CVRP). Instead of relying on human dispatchers, the platform utilizes **Turf.js** to perform dynamic geographic partitioning. When a dispatch is triggered, the engine calculates the spatial distances between all pending waste nodes (using Haversine formulas) relative to the depot. It then auto-clusters these nodes into highly optimized, localized routes, locking the assignment the moment the cumulative weight approaches the strict 400kg vehicle capacity limit, ensuring vehicles never exceed legal thresholds while minimizing empty-load mileage.
 
-### 🗺️ State LGD Integration
-*   Integrated mapping for Chhattisgarh’s administrative hierarchy: **District ➔ Block ➔ Panchayat ➔ Village**.
-*   Restricts inputs and maps locations using database constraints to guarantee standardized reports.
+### 🗺️ LGD (Local Government Directory) Standardization
+To ensure seamless integration with Indian governmental databases, EcoRoute implements rigorous LGD standardization. The platform maps incoming geographic coordinates through a highly structured JSON hierarchy—translating raw lat/long data into exact **District -> Block -> Panchayat -> Village** standard identifiers. This deterministic resolution guarantees that state executives view data partitioned by official administrative boundaries, ensuring strict data compliance and operational reporting accuracy.
 
-### 🧠 Routing Intelligence
-*   **Spatial Waypoint Clustering:** Groups nearby pickup requests using Turf.js centroids to reduce waypoints before hitting OpenRouteService APIs.
-*   **Monsoon Waterlogging Multipliers:** Adjusts expected waste weight by **1.25x** during monsoon months (June-September) to account for wet, waterlogged plastics.
-*   **Fuel-Saving Thresholds:** Filters out unprofitable pickups under **10kg** to prevent unnecessary travel.
+### 📡 Offline-First Field Operations
+Recognizing the reality of unpredictable network connectivity in rural Chhattisgarh, the application architecture relies heavily on service workers and local caching. SHG workers can continue to log waste accumulations, interact with the UI, and queue transactions even in complete dead zones. Once connectivity is restored, the Next.js edge runtime automatically synchronizes the localized state with the PostgreSQL backend, ensuring zero data loss and uninterrupted field operations.
 
 ### 🎙️ Bilingual Voice UI
-*   Accessible regional speech-to-weight entry for SHG workers.
-*   Converts spoken weight entries (Hindi, Chhattisgarhi, English) into digital metrics using Groq and Whisper API transcriptions.
+Digital literacy and hardware familiarity are significant barriers for rural SHG workers. EcoRoute mitigates this by replacing complex form inputs with a highly accessible Voice UI. Workers can simply speak their inputs (e.g., "Pachis kilo"), and the platform securely proxies the audio blob to the Groq/Whisper API for localized, bilingual transcription. This transforms raw speech into structured numeric data points instantly, drastically lowering the barrier to entry for platform adoption.
 
-### 💰 Transparent PR (Plastic Rupee) Wallet
-*   Dynamic financial ledger showing live weight summaries and real-time earnings mapped to precise ₹/kg rates.
-*   Establishes complete trust and motivation for rural collectors.
-
-### 📸 EPR Photo Verification
-*   Mobile-native camera interface forcing drivers to capture **live, rear-facing geofenced photos** of waste at drops.
-*   Secures images directly inside Supabase Storage Buckets to enforce strict compliance proof.
-
-### 📊 Executive Dashboard & Export APIs
-*   Live geographic waste density maps using custom-scaled Leaflet `CircleMarker` points.
-*   Fully secure integration APIs supporting CSV/JSON exports protected by token headers (`x-api-key`).
+### 💰 PR Wallet Economics
+EcoRoute features a real-time Transparent PR (Plastic Recovery) Wallet system. This financial ledger operates synchronously with the collection database. As soon as a collector captures EPR-compliant proof and finalizes a pickup transaction, the system dynamically maps the exact kg-collected (separated precisely into PET, HDPE, LDPE, and PP sub-weights) to a direct ₹/kg monetary valuation. This instantaneous financial visibility ensures transparent compensation tracking for SHG workers.
 
 ---
 
-## 🛠️ Tech Stack
+## 4. API Documentation (EPR Integration)
 
-EcoRoute is built using the most robust, state-of-the-art modern stack available:
+EcoRoute provides a secure, structured export endpoint designed specifically for corporate Extended Producer Responsibility (EPR) sponsors to ingest compliance data into their internal analytics systems.
 
-*   **Framework:** Next.js 16 (App Router) with React 19
-*   **Styling & UI:** Tailwind CSS, shadcn/ui, Lucide Icons, and Phosphor React
-*   **Database & Storage:** Supabase (PostgreSQL, Storage Buckets, and Row Level Security)
-*   **Geospatial Processing:** React-Leaflet, Leaflet, and Turf.js (`@turf/turf`)
-*   **Audio Transcription:** Web Audio API, Groq Cloud, and Whisper Large v3
-*   **Languages:** TypeScript & NextJS Server Actions
+### Secure CSV Export Endpoint
+- **Endpoint:** `GET /api/integration/v1/export`
+- **Description:** Returns a fully flattened CSV ledger of all completed waste collections. The export merges raw collection sub-weights with precise Chhattisgarh LGD administrative hierarchy data and Supabase Storage photo proof URLs.
+- **Authentication:** Requires a custom API token passed via headers.
+  - **Header:** `x-api-key`
+  - **Value:** Configured via `INTEGRATION_API_KEY` environment variable.
+
+#### Output Structure (CSV Columns)
+The returned CSV includes the following deterministic data points:
+- `Collection ID`, `Date of Collection`
+- Administrative Routing: `District Name`, `District LGD Code`, `Block Name`, `Block LGD Code`, `Panchayat Name`, `Panchayat LGD Code`, `Village Name`, `Village LGD Code`
+- Material Segregation: `PET Weight (kg)`, `HDPE Weight (kg)`, `LDPE Weight (kg)`, `PP Weight (kg)`, `Total Weight (kg)`
+- Compliance Verification: `EPR Compliance Status`, `Proof Image URL`
 
 ---
 
-## 💻 Local Setup Instructions
+## 5. Local Development & Setup
 
-Follow these clear steps to run the EcoRoute environment locally.
+To evaluate the platform locally, follow these technical setup procedures:
 
-### 1️⃣ Clone and Install Dependencies
+### Step 1: Install Dependencies
+Ensure you are running a modern Node.js environment.
 ```bash
-# Clone the repository
-git clone https://github.com/aroy-sudo/garbage-rout-app-main.git
-cd garbage-rout-app-main
-
-# Install production and development dependencies
 npm install
 ```
 
-### 2️⃣ Configure Environment Variables
-Create a `.env.local` file in the root directory and specify the following variables:
+### Step 2: Configure Environment Variables
+Create a `.env.local` file in the repository root and map your Supabase instance credentials:
 ```env
-# Supabase Authentication and Database Details
-NEXT_PUBLIC_SUPABASE_URL=https://your-supabase-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-
-# OpenRouteService API Integration
-ORS_API_KEY=5b3ce3597851110001cf6248...
-
-# Groq Cloud API Key (Bilingual Transcription Engine)
-GROQ_API_KEY=gsk_y256bV...
-
-# State API Key Authentication
-INTEGRATION_API_KEY=cg_epr_secure_prod_key_2026
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 ```
 
-### 3️⃣ Seed the LGD Database Hierarchy
-EcoRoute relies on seeded regional location tables matching the official local Chhattisgarh directory. Run the seed script:
+### Step 3: Seed Realistic Demo Data
+Populate the PostgreSQL database with a highly realistic, Turf.js-spaced matrix of waste accumulation nodes centered around the Durg/Bhilai administrative region.
 ```bash
-npx tsx scripts/seed-locations.ts
+npm run seed:demo
 ```
 
-### 4️⃣ Start the Local Development Server
-Launch the server to verify the system locally:
+### Step 4: Initialize the Edge Server
+Launch the Next.js development server.
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) inside your browser to view the interactive portal.
 
----
-
-## 📂 Project Architecture
-
-```
-garbage-rout-app/
-├── app/
-│   ├── actions/                   # Next.js Server Actions (Database and Files)
-│   │   ├── admin-actions.ts       # Executive Heatmap and Stats Fetcher
-│   │   ├── location-actions.ts    # LGD Directory Hierarchical Actions
-│   │   └── verification-actions.ts# EPR Storage Upload Actions
-│   ├── api/                       # API Route Endpoints
-│   │   ├── integration/v1/export/ # Standard CSV Integration API
-│   │   └── transcribe/            # Voice Transcription Endpoint
-│   └── dashboard/
-│       └── admin/                 # Admin Dashboard Pages
-├── src/
-│   ├── components/                # React Map and UI Components
-│   │   ├── AdminHeatmap.tsx       # Leaflet Spatial Density Component
-│   │   ├── LocationSelector.tsx   # LGD Hierarchy Selector
-│   │   └── PhotoProofCapture.tsx  # Mobile Geofenced Camera component
-│   └── hooks/
-│       └── useVoiceRecorder.ts    # Native Voice UI audio recorder hook
-```
-
----
-*EcoRoute is fully type-safe, validated by ESLint, and optimized to protect our environment while elevating rural livelihoods. Developed for Chhattisgarh State Urban Development Agency (SUDA) and EPR Corporations.*
+Navigate to [http://localhost:3000](http://localhost:3000) to interface with the platform.
