@@ -19,6 +19,7 @@ import {
 } from "@phosphor-icons/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import FAQSection from "@/src/components/FAQSection";
+import { AdminDispatchPanel } from "@/src/components/AdminDispatchPanel";
 
 const AdminMap = dynamic(() => import("@/src/components/AdminMap"), {
   ssr: false,
@@ -226,6 +227,11 @@ export default function AdminDashboard() {
               </Card>
             );
           })}
+        </div>
+
+        {/* Dispatch Panel */}
+        <div className="w-full">
+          <AdminDispatchPanel />
         </div>
 
         {/* Statewide Waste Accumulation Card */}

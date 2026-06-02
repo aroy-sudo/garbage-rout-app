@@ -48,9 +48,10 @@ type PickupRequest = {
 
 interface ResidentMapProps {
   center?: [number, number] | null;
+  pendingPickup?: { lat: number, lng: number } | null;
 }
 
-const ResidentMap = ({ center }: ResidentMapProps) => {
+const ResidentMap = ({ center, pendingPickup }: ResidentMapProps) => {
   const supabase = createClient();
   const [activePickups, setActivePickups] = useState<GeoPoint[]>([]);
   const [dummyTrucks, setDummyTrucks] = useState<DummyTruck[]>([]);
@@ -245,6 +246,21 @@ const ResidentMap = ({ center }: ResidentMapProps) => {
 
         {/* Render Pending Pickups from Supabase */}
         {/* Now handled by ZoneRoutingLayer Drop-Pins! */}
+
+        {/* User's newly submitted pickup */}
+        {pendingPickup && (
+          <Marker 
+            position={[pendingPickup.lat, pendingPickup.lng]}
+            icon={L.divIcon({
+              className: "custom-pulsing-marker",
+              html: `<div style="display:flex; align-items:center; justify-content:center; width:24px; height:24px; background-color:#22c55e; border-radius:50%; border:3px solid white; box-shadow: 0 0 10px rgba(34,197,94,0.8); animation: pulse 2s infinite;"></div>`,
+              iconSize: [24, 24],
+              iconAnchor: [12, 12],
+            })}
+          >
+            <Popup>Your scheduled pickup location</Popup>
+          </Marker>
+        )}
 
         {/* Render Animated Dummy Collector Trucks */}
         {dummyTrucks.map(truck => (

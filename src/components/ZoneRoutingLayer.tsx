@@ -189,40 +189,7 @@ export default function ZoneRoutingLayer({
 
   return (
     <>
-      {/* ── Hexagonal zone polygons ─────────────────────────────────────── */}
-      {ZONES.map(zone => {
-        const isActive = activeZone === zone.id;
-        const shgsInZone = allAssigned.filter(s => s.zone.id === zone.id);
-
-        return (
-          <Polygon
-            key={zone.id}
-            positions={zone.polygon}
-            pathOptions={{
-              color: zone.color,
-              fillColor: zone.fillColor,
-              fillOpacity: isActive ? 0.28 : 0.1,
-              weight: isActive ? 3 : 1.5,
-            }}
-            eventHandlers={{
-              click: () =>
-                setActiveZone(prev => (prev === zone.id ? null : zone.id)),
-            }}
-          >
-            <Tooltip direction="center" sticky>
-              <div style={{ fontWeight: 600, fontSize: 12, lineHeight: 1.7 }}>
-                <span style={{ color: zone.color, fontSize: 13 }}>⬡ {zone.label}</span>
-                <br />
-                👥 SHGs: {shgsInZone.length}
-                <br />
-                ♻️ {ZONE_DEPOTS[zone.id] ? "Click recycler to route" : "No recycler in zone (No route)"}
-              </div>
-            </Tooltip>
-          </Polygon>
-        );
-      })}
-
-
+      {/* ── Hexagonal zone polygons (Removed) ─────────────────────────── */}
 
       {/* ── Road-following route polylines (one per zone, on demand) ────── */}
       {ZONES.map(zone => {

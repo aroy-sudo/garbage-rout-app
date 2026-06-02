@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import AnalyticsDashboard from "@/src/components/AnalyticsDashboard";
 import PickupStatusTable from "@/src/components/PickupStatusTable";
 import GarbageChatBot from "@/src/components/GarbageChatBot";
-import { Leaf } from "lucide-react";
+import { Leaf, Loader2 } from "lucide-react";
 import Link from "next/link";
 import PaymentPopup from "@/src/components/PaymentPopup";
 import FAQSection from "@/src/components/FAQSection";
@@ -15,6 +15,9 @@ import LocationSelector from "@/src/components/ui/LocationSelector";
 import VoiceWeightInput from "@/src/components/ui/VoiceWeightInput";
 import PRWalletCard from "@/src/components/PRWalletCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { submitPickupRequest } from "@/app/actions/pickup-actions";
+import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 
 // Safely import the Leaflet map for the client side only
 const ResidentMap = dynamic(() => import("@/src/components/ResidentMap"), {
@@ -33,6 +36,30 @@ export default function ResidentDashboard() {
     lng?: number;
   } | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submittedPickup, setSubmittedPickup] = useState<{ lat: number, lng: number } | null>(null);
+
+  const handleSubmit = async () => {
+    if (!weight || weight === 0 || !location?.lat || !location?.lng) return;
+    
+    setIsSubmitting(true);
+    const res = await submitPickupRequest({
+      weight_kg: weight,
+      lat: location.lat,
+      lng: location.lng,
+      village_id: location.villageId,
+    });
+    
+    if (res.error) {
+      toast.error(res.error);
+    } else {
+      toast.success(res.message);
+      setSubmittedPickup({ lat: location.lat, lng: location.lng });
+      setWeight(0);
+      setLocation(null);
+    }
+    setIsSubmitting(false);
+  };
 
   return (
     <div className="relative flex min-h-screen flex-col bg-zinc-50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
@@ -92,12 +119,33 @@ export default function ResidentDashboard() {
                   }
                 }}
               />
-              <VoiceWeightInput onWeightExtracted={(w) => setWeight(w)} />
-              <div className="mt-4 p-4 rounded-xl bg-[#e8fccf]/30 border border-[#e8fccf] dark:bg-[#134611]/20 dark:border-[#134611]/40 flex items-center justify-center">
-                <p className="font-semibold text-[#134611] dark:text-[#96e072] flex items-center gap-2">
-                  <Leaf className="w-5 h-5" /> Current Logged Weight: {weight || 0} kg
-                </p>
+              <div className="flex flex-col gap-4 mt-4">
+                <div className="flex items-center gap-4">
+                  <Input 
+                    type="number" 
+                    placeholder="Manual weight (kg)" 
+                    value={weight || ''} 
+                    onChange={(e) => setWeight(Number(e.target.value))} 
+                    className="flex-1 text-lg py-6"
+                  />
+                  <div className="flex-shrink-0">
+                    <VoiceWeightInput onWeightExtracted={(w) => setWeight(w)} />
+                  </div>
+                </div>
+                <div className="p-4 rounded-xl bg-[#e8fccf]/30 border border-[#e8fccf] dark:bg-[#134611]/20 dark:border-[#134611]/40 flex items-center justify-center">
+                  <p className="font-semibold text-[#134611] dark:text-[#96e072] flex items-center gap-2">
+                    <Leaf className="w-5 h-5" /> Current Logged Weight: {weight || 0} kg
+                  </p>
+                </div>
               </div>
+              <Button 
+                className="w-full mt-4" 
+                onClick={handleSubmit} 
+                disabled={weight === 0 || !location?.lat || isSubmitting}
+              >
+                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+                Submit Pickup Request
+              </Button>
             </CardContent>
           </Card>
           
@@ -112,7 +160,7 @@ export default function ResidentDashboard() {
           
           {/* Map Container */}
           <div className="h-[600px] w-full rounded-2xl border border-[#e8fccf] bg-white shadow-xl shadow-[#134611]/10 overflow-hidden dark:border-[#134611]/30 dark:bg-zinc-900">
-            <ResidentMap center={mapCenter} />
+            <ResidentMap center={mapCenter} pendingPickup={submittedPickup} />
           </div>
 
           {/* Pickup Status Table */}

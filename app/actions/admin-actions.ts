@@ -8,6 +8,7 @@
 "use server";
 
 import { createClient } from "@/src/utils/supabase/server";
+import * as turf from "@turf/turf";
 
 export interface HeatmapPoint {
   id: string;
@@ -122,4 +123,81 @@ export async function getHeatmapData(): Promise<SimpleHeatmapPoint[]> {
     console.error("Exception in getHeatmapData server action:", err);
     return [];
   }
+}
+
+export async function autoDispatchRoutes(maxCapacityKg: number, availableDriverIds: string[]) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, message: "Unauthorized" };
+  }
+
+  const { data: pickups, error } = await supabase
+    .from("pickup_requests")
+    .select("*")
+    .eq("status", "pending");
+
+  if (error) {
+    console.error("Failed to fetch pending pickups", error);
+    return { success: false, message: "Failed to fetch pending pickups" };
+  }
+
+  if (!pickups || pickups.length === 0) {
+    return { success: false, message: "No pending pickups" };
+  }
+
+  const startPoint = turf.point([pickups[0].longitude, pickups[0].latitude]);
+
+  const sortedPickups = [...pickups].sort((a, b) => {
+    const ptA = turf.point([a.longitude, a.latitude]);
+    const ptB = turf.point([b.longitude, b.latitude]);
+    return turf.distance(startPoint, ptA) - turf.distance(startPoint, ptB);
+  });
+
+  const routes: any[][] = [];
+  let currentRoute: any[] = [];
+  let currentWeight = 0;
+
+  for (const pickup of sortedPickups) {
+    const pWeight = pickup.weight_kg || pickup.weight || 0;
+
+    if (currentWeight + pWeight > maxCapacityKg && currentRoute.length > 0) {
+      routes.push(currentRoute);
+      currentRoute = [pickup];
+      currentWeight = pWeight;
+    } else {
+      currentRoute.push(pickup);
+      currentWeight += pWeight;
+    }
+  }
+
+  if (currentRoute.length > 0) {
+    routes.push(currentRoute);
+  }
+
+  if (availableDriverIds.length === 0) {
+    return { success: false, message: "No available drivers" };
+  }
+
+  for (let i = 0; i < routes.length; i++) {
+    const route = routes[i];
+    const driverId = availableDriverIds[i % availableDriverIds.length];
+    const pickupIds = route.map(p => p.id);
+
+    const { error: updateError } = await supabase
+      .from("pickup_requests")
+      .update({
+        assigned_driver_id: driverId,
+        route_group_id: `route_${i + 1}_${Date.now()}`,
+        status: "assigned"
+      })
+      .in("id", pickupIds);
+
+    if (updateError) {
+      console.error("Failed to update route assignments", updateError);
+    }
+  }
+
+  return { success: true, routesGenerated: routes.length, message: "Routes successfully dispatched!" };
 }

@@ -4,13 +4,15 @@ import { logOut } from "../actions";
 import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
 import PickupStatusTable from "@/src/components/PickupStatusTable";
-import { Leaf } from "lucide-react";
+import { Leaf, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import CollectorAnalytics from "@/src/components/CollectorAnalytics";
 import FAQSection from "@/src/components/FAQSection";
-import { useState } from "react";
-import PhotoProofCapture from "@/src/components/ui/PhotoProofCapture";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PickupTransactionSheet } from "@/src/components/PickupTransactionSheet";
+import { createClient } from "@/src/utils/supabase/client";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Safely import the map for the client side only
 const CollectorMap = dynamic(() => import("@/src/components/CollectorMap"), {
@@ -19,7 +21,30 @@ const CollectorMap = dynamic(() => import("@/src/components/CollectorMap"), {
 });
 
 export default function CollectorDashboard() {
-  const [proofUrl, setProofUrl] = useState<string | null>(null);
+  const [selectedPickup, setSelectedPickup] = useState<any | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [pendingPickups, setPendingPickups] = useState<any[]>([]);
+  const [completedPickups, setCompletedPickups] = useState<any[]>([]);
+
+  const supabase = createClient();
+
+  useEffect(() => {
+    const fetchPickups = async () => {
+      const { data: pending } = await supabase.from("pickup_requests").select("*").eq("status", "pending");
+      const { data: completed } = await supabase.from("pickup_requests").select("*").eq("status", "completed");
+      if (pending) setPendingPickups(pending);
+      if (completed) setCompletedPickups(completed);
+    };
+    fetchPickups();
+  }, [supabase]);
+
+  const handleCompletion = (id: string) => {
+    const completed = pendingPickups.find(p => p.id === id);
+    if (completed) {
+      setPendingPickups(prev => prev.filter(p => p.id !== id));
+      setCompletedPickups(prev => [completed, ...prev]);
+    }
+  };
 
   return (
     <div className="relative flex min-h-screen flex-col bg-zinc-50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
@@ -61,49 +86,73 @@ export default function CollectorDashboard() {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          <div className="lg:col-span-2 rounded-2xl bg-white shadow-xl shadow-emerald-900/10 dark:bg-zinc-900 overflow-hidden border border-emerald-100 dark:border-emerald-900/30">
+          <div className="lg:col-span-3 rounded-2xl bg-white shadow-xl shadow-emerald-900/10 dark:bg-zinc-900 overflow-hidden border border-emerald-100 dark:border-emerald-900/30">
             <div className="p-6 h-full flex flex-col justify-center">
               <CollectorAnalytics />
             </div>
           </div>
-          
-          <Card className="rounded-2xl shadow-xl shadow-emerald-900/10 dark:bg-zinc-900 overflow-hidden border border-emerald-100 dark:border-emerald-900/30 bg-white">
-            <CardHeader className="bg-emerald-50/50 border-b border-emerald-100/50 dark:bg-emerald-900/10 dark:border-emerald-900/30">
-              <CardTitle className="text-emerald-900 dark:text-emerald-400 font-bold">Current Pickup</CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-4">
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-2">Capture photo proof for EPR compliance at the current pickup location.</p>
-              <PhotoProofCapture onUploadComplete={(url) => setProofUrl(url)} />
-              
-              {proofUrl && (
-                <div className="mt-4 p-4 rounded-xl bg-emerald-50 border border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-900/40 flex items-center gap-4">
-                  <div className="flex-1">
-                    <p className="font-semibold text-emerald-800 dark:text-emerald-400 flex items-center gap-2">
-                      ✅ EPR Proof Captured
-                    </p>
-                    <p className="text-xs text-emerald-600 dark:text-emerald-500 mt-1 truncate">Verified & uploaded to chain</p>
-                  </div>
-                  <div className="w-16 h-16 rounded-lg overflow-hidden border-2 border-emerald-200 shrink-0">
-                    <img src={proofUrl} alt="EPR Proof Thumbnail" className="w-full h-full object-cover" />
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
         </div>
 
         <div className="grid gap-8">
           {/* Collector Analytics moved to top row */}
           <div className="h-[600px] w-full rounded-2xl border border-emerald-100 bg-white shadow-xl shadow-emerald-900/10 overflow-hidden dark:border-emerald-900/30 dark:bg-zinc-900">
-             <CollectorMap />
+             <CollectorMap 
+               pickupNodes={pendingPickups} 
+               onMarkerClick={(pickup) => { 
+                 setSelectedPickup(pickup); 
+                 setIsSheetOpen(true); 
+               }} 
+             />
           </div>
 
           <div className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-xl shadow-emerald-900/10 dark:border-emerald-900/30 dark:bg-zinc-900">
-            <PickupStatusTable />
+            <Tabs defaultValue="pending" className="w-full">
+              <TabsList className="mb-4">
+                <TabsTrigger value="pending">Pending Pickups ({pendingPickups.length})</TabsTrigger>
+                <TabsTrigger value="completed">Completed ({completedPickups.length})</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="pending" className="space-y-4">
+                {pendingPickups.map(pickup => (
+                  <Card key={pickup.id} className="cursor-pointer hover:border-emerald-500 transition-colors" onClick={() => { setSelectedPickup(pickup); setIsSheetOpen(true); }}>
+                    <CardContent className="p-4 flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-emerald-900 dark:text-emerald-400">{pickup.location_name || `Pickup #${pickup.id}`}</p>
+                        <p className="text-sm text-zinc-500">{pickup.weight || pickup.weight_kg || 0} kg</p>
+                      </div>
+                      <Button variant="outline" size="sm">Process</Button>
+                    </CardContent>
+                  </Card>
+                ))}
+                {pendingPickups.length === 0 && <p className="text-zinc-500">No pending pickups.</p>}
+              </TabsContent>
+
+              <TabsContent value="completed" className="space-y-4">
+                {completedPickups.map(pickup => (
+                  <Card key={pickup.id} className="bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200">
+                    <CardContent className="p-4 flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-emerald-900 dark:text-emerald-400">{pickup.location_name || `Pickup #${pickup.id}`}</p>
+                        <p className="text-sm text-emerald-700">{pickup.weight || pickup.weight_kg || 0} kg Final Weight</p>
+                      </div>
+                      <CheckCircle2 className="text-emerald-500 w-6 h-6" />
+                    </CardContent>
+                  </Card>
+                ))}
+                {completedPickups.length === 0 && <p className="text-zinc-500">No completed pickups yet.</p>}
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
 
         <FAQSection />
+
+        <PickupTransactionSheet 
+          isOpen={isSheetOpen} 
+          onClose={() => setIsSheetOpen(false)} 
+          pickup={selectedPickup} 
+          onComplete={handleCompletion} 
+        />
       </main>
     </div>
   );

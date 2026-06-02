@@ -86,7 +86,12 @@ const fetchORSRoute = async (
   }
 };
 
-const CollectorMap = () => {
+interface CollectorMapProps {
+  pickupNodes?: any[];
+  onMarkerClick?: (pickup: any) => void;
+}
+
+const CollectorMap = ({ pickupNodes, onMarkerClick }: CollectorMapProps = {}) => {
   const supabase = createClient();
 
   const [pickupRequests, setPickupRequests] = useState<PickupRequest[]>([]);
@@ -347,6 +352,7 @@ const CollectorMap = () => {
               iconSize: [32, 32],
               iconAnchor: [16, 16],
             })}
+            eventHandlers={{ click: () => onMarkerClick?.(node) }}
           >
             <Popup>
               <strong>Clustered Pickups</strong>
@@ -362,6 +368,7 @@ const CollectorMap = () => {
             distanceMeters={routeData.routeSummary.distance}
             durationSeconds={routeData.routeSummary.duration}
             nodeCount={routeData.pickupNodes.length}
+            pickupNodes={routeData.pickupNodes}
           />
         )}
 
