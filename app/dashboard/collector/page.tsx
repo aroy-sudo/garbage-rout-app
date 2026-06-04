@@ -2,7 +2,7 @@
 
 import { logOut } from "../actions"; 
 import { Button } from "@/components/ui/button";
-import dynamic from "next/dynamic";
+
 import PickupStatusTable from "@/src/components/PickupStatusTable";
 import { Leaf, CheckCircle2, CheckCircle } from "lucide-react";
 import Link from "next/link";
@@ -14,17 +14,59 @@ import { PickupTransactionSheet } from "@/src/components/PickupTransactionSheet"
 import { createClient } from "@/src/utils/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Safely import the map for the client side only
-const CollectorMap = dynamic(() => import("@/src/components/CollectorMap"), {
-  ssr: false,
-  loading: () => <p className="text-zinc-500 flex items-center justify-center h-full">Loading routes...</p>,
-});
+import CollectorGoogleMap from "@/src/components/CollectorGoogleMap";
+import { TelemetryCard } from "@/src/components/ui/TelemetryCard";
+import { useDriverTracking } from "@/src/hooks/useDriverTracking";
+import { isWithinRadius } from "@/src/utils/geofencing";
+import { toast } from "sonner";
 
 export default function CollectorDashboard() {
   const [selectedPickup, setSelectedPickup] = useState<any | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [pendingPickups, setPendingPickups] = useState<any[]>([]);
   const [completedPickups, setCompletedPickups] = useState<any[]>([]);
+  const [routeSummary, setRouteSummary] = useState<{ distanceMeters: number, durationSeconds: number } | null>(null);
+
+  const [isTrackingLocation, setIsTrackingLocation] = useState(false);
+  const [routeId, setRouteId] = useState<string | null>(null);
+  const { location, error: trackingError } = useDriverTracking(routeId, isTrackingLocation);
+  const [hasArrived, setHasArrived] = useState(false);
+
+  const toggleLocationTracking = () => {
+    if (isTrackingLocation) {
+      setIsTrackingLocation(false);
+      setRouteId(null);
+      toast.success("Location tracking stopped");
+    } else {
+      setRouteId("route-raipur-01");
+      setIsTrackingLocation(true);
+      toast.success("Location tracking started");
+    }
+  };
+
+  const startRoute = () => {
+    if (!location) {
+      toast.error("Enable location first");
+      return;
+    }
+    toast.info("Starting route from current GPS");
+  };
+
+  const nextPickupTarget = pendingPickups.length > 0 ? pendingPickups[0] : null;
+
+  useEffect(() => {
+    setHasArrived(false);
+  }, [nextPickupTarget?.id]);
+
+  useEffect(() => {
+    if (!location || !nextPickupTarget || hasArrived) return;
+    const withinRadius = isWithinRadius(location, { lat: nextPickupTarget.latitude, lng: nextPickupTarget.longitude }, 50);
+    if (withinRadius) {
+      setHasArrived(true);
+      toast.success("Automatically arrived at destination (within 50m)!");
+      handleCompletion(nextPickupTarget.id);
+    }
+  }, [location, nextPickupTarget, hasArrived]);
 
   const supabase = createClient();
 
@@ -95,13 +137,40 @@ export default function CollectorDashboard() {
 
         <div className="grid gap-8">
           {/* Collector Analytics moved to top row */}
-          <div className="h-[600px] w-full rounded-2xl border border-emerald-100 bg-white shadow-xl shadow-emerald-900/10 overflow-hidden dark:border-emerald-900/30 dark:bg-zinc-900">
-             <CollectorMap 
+          <div className="relative h-[600px] w-full rounded-2xl border border-emerald-100 bg-white shadow-xl shadow-emerald-900/10 overflow-hidden dark:border-emerald-900/30 dark:bg-zinc-900">
+             <div className="absolute top-4 left-4 z-[1000] flex gap-2">
+               <Button
+                 onClick={toggleLocationTracking}
+                 variant={isTrackingLocation ? "destructive" : "default"}
+                 size="sm"
+               >
+                 📍 {isTrackingLocation ? "Stop GPS" : "Enable GPS"}
+               </Button>
+               <Button
+                 onClick={startRoute}
+                 size="sm"
+                 variant="outline"
+                 className="bg-white/80 backdrop-blur"
+               >
+                 🚀 Start Route
+               </Button>
+             </div>
+             {routeSummary && (
+               <TelemetryCard 
+                 distanceMeters={routeSummary.distanceMeters}
+                 durationSeconds={routeSummary.durationSeconds}
+                 nodeCount={pendingPickups.length}
+                 pickupNodes={pendingPickups.map(p => ({ lat: p.latitude || p.lat, lng: p.longitude || p.lng }))}
+               />
+             )}
+             <CollectorGoogleMap 
                pickupNodes={pendingPickups} 
+               driverLocation={location}
                onMarkerClick={(pickup) => { 
                  setSelectedPickup(pickup); 
                  setIsSheetOpen(true); 
                }} 
+               onRouteCalculated={(metrics) => setRouteSummary(metrics)}
              />
           </div>
 
